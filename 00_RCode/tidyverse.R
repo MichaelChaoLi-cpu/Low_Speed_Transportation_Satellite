@@ -45,8 +45,24 @@ AggragateData <- function(raw_data, speed_set, valid_ID){
   return(raw_data)
 }
 
-MonthSpeedOutput <- function(data.frame.input, point.coords, loop = c(0,1,2,3), fileaddress){
+MonthSpeedOutput <- function(data.frame.input, point.coords, loop = c(0,1,2,3), half = 0, fileaddress){
   message("Begin!\n")
+  quarter <- round(nrow(data.frame.input)/4)
+  message(quarter)
+  lower <- quarter*loop + 1
+  if(loop == 3){
+    upper <- nrow(data.frame.input)
+  } else {
+    upper <- quarter * (loop + 1)
+  }
+  if(half == 1){
+    upper <- upper - round(quarter/2)
+  } 
+  if(half == 2){
+    lower <- round(quarter/2) + lower
+  }
+  message(upper, "-", lower)
+  data.frame.input <- data.frame.input[lower:upper,]
   Ori <- data.frame.input %>%
     dplyr::select(Ori_ID)
   Ori <- left_join(Ori, point.coords %>% rename(Ori_ID = ID), by = "Ori_ID")
@@ -76,15 +92,7 @@ MonthSpeedOutput <- function(data.frame.input, point.coords, loop = c(0,1,2,3), 
   gc()
   lines.total <- st_as_sf(lines.total)
   lines.total$Real_estimation <- data.frame.input[,3]
-  quarter <- round(nrow(lines.total)/4)
-  message(quarter)
-  lower <- quarter*loop + 1
-  if(loop == 3){
-    upper <- nrow(lines.total)
-  } else {
-    upper <- quarter * (loop + 1)
-  }
-  lines.total.used <- lines.total[lower:upper,]
+  lines.total.used <- lines.total
   rm(lines.total)
   rm(data.frame.input)
   rm(point.coords)
@@ -231,8 +239,86 @@ setwd("C:\\11_Article\\01_Data\\01_mesh\\")
 MonthSpeedOutput(raw_data_2019_04.20_, cents.coords, loop = 0, 
                  fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_04.20_.q1.csv")
 MonthSpeedOutput(raw_data_2019_04.20_, cents.coords, loop = 1, 
-                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_04.20_.q2.csv") #here
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_04.20_.q2.csv")
 MonthSpeedOutput(raw_data_2019_04.20_, cents.coords, loop = 2, 
                  fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_04.20_.q3.csv")
 MonthSpeedOutput(raw_data_2019_04.20_, cents.coords, loop = 3, 
                  fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_04.20_.q4.csv")
+
+# 2020.05 20-
+setwd("C:\\11_Article\\01_Data\\02_ODMatrix\\")
+### be carefully here, we have write a csv, we do not need to do it again
+raw_data_2019_05 <- read_csv("od_data_201905.csv", 
+                             locale = locale(encoding = "shift-jis"))
+raw_data_2019_05 <- CleanData(raw_data_2019_05)
+
+raw_data_2019_05.20_ <- AggragateData(raw_data_2019_05, "20-", valid_ID)
+rm(raw_data_2019_05)
+gc()
+#save.image("C:\\11_Article\\01_Data\\02_ODMatrix\\Temp.Rdata")
+
+load("C:/11_Article/01_Data/02_ODMatrix/Temp.Rdata")
+setwd("C:\\11_Article\\01_Data\\01_mesh\\")
+MonthSpeedOutput(raw_data_2019_05.20_, cents.coords, loop = 0, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_05.20_.q1.csv")
+MonthSpeedOutput(raw_data_2019_05.20_, cents.coords, loop = 1, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_05.20_.q2.csv") 
+MonthSpeedOutput(raw_data_2019_05.20_, cents.coords, loop = 2, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_05.20_.q3.csv")
+MonthSpeedOutput(raw_data_2019_05.20_, cents.coords, loop = 3, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_05.20_.q4.csv")
+
+
+# 2020.06 20-
+setwd("C:\\11_Article\\01_Data\\02_ODMatrix\\")
+### be carefully here, we have write a csv, we do not need to do it again
+raw_data_2019_06 <- read_csv("od_data_201906.csv", 
+                             locale = locale(encoding = "shift-jis"))
+raw_data_2019_06 <- CleanData(raw_data_2019_06)
+
+raw_data_2019_06.20_ <- AggragateData(raw_data_2019_06, "20-", valid_ID)
+rm(raw_data_2019_06)
+gc()
+#save.image("C:\\11_Article\\01_Data\\02_ODMatrix\\Temp.Rdata")
+
+load("C:/11_Article/01_Data/02_ODMatrix/Temp.Rdata")
+setwd("C:\\11_Article\\01_Data\\01_mesh\\")
+MonthSpeedOutput(raw_data_2019_06.20_, cents.coords, loop = 0, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_06.20_.q1.csv") 
+MonthSpeedOutput(raw_data_2019_06.20_, cents.coords, loop = 1, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_06.20_.q2.csv") 
+MonthSpeedOutput(raw_data_2019_06.20_, cents.coords, loop = 2, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_06.20_.q3.csv")
+MonthSpeedOutput(raw_data_2019_06.20_, cents.coords, loop = 3, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_06.20_.q4.csv") 
+
+# 2020.07 20-
+setwd("C:\\11_Article\\01_Data\\02_ODMatrix\\")
+### be carefully here, we have write a csv, we do not need to do it again
+raw_data_2019_07 <- read_csv("od_data_201907.csv", 
+                             locale = locale(encoding = "shift-jis"))
+raw_data_2019_07 <- CleanData(raw_data_2019_07)
+
+raw_data_2019_07.20_ <- AggragateData(raw_data_2019_07, "20-", valid_ID)
+rm(raw_data_2019_07)
+gc()
+rm(raw_data_2019_06.20_)
+#save.image("C:\\11_Article\\01_Data\\02_ODMatrix\\Temp.Rdata")
+
+load("C:/11_Article/01_Data/02_ODMatrix/Temp.Rdata")
+setwd("C:\\11_Article\\01_Data\\01_mesh\\")
+MonthSpeedOutput(raw_data_2019_07.20_, cents.coords, loop = 0, 
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_07.20_.q1.csv") 
+# from here a new version of MonthSpeedOutput begin to be used
+MonthSpeedOutput(raw_data_2019_07.20_, cents.coords, loop = 1, half = 1,
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_07.20_.q2.1.csv")
+MonthSpeedOutput(raw_data_2019_07.20_, cents.coords, loop = 1, half = 2,
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_07.20_.q2.2.csv") 
+MonthSpeedOutput(raw_data_2019_07.20_, cents.coords, loop = 2, half = 1,
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_07.20_.q3.1.csv")
+MonthSpeedOutput(raw_data_2019_07.20_, cents.coords, loop = 2, half = 2,
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_07.20_.q3.2.csv") #
+MonthSpeedOutput(raw_data_2019_07.20_, cents.coords, loop = 3, half = 1,
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_07.20_.q4.1.csv") 
+MonthSpeedOutput(raw_data_2019_07.20_, cents.coords, loop = 3, half = 2,
+                 fileaddress = "C:/11_Article/01_Data/04_WashedData/raw_data_2019_07.20_.q4.2.csv") 
