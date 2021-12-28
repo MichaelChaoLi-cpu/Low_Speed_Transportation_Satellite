@@ -1,3 +1,13 @@
+# Author: M.L.
+
+# output: raw_data_20XX_XX.20_.qX.csv
+# raw_data_20XX_XX.20_.qX.csv: "Group.1" this is the grid id to finish spatial join.
+# raw_data_20XX_XX.20_.qX.csv: "x" estimation of the flow on a certain grid.
+
+# note: raw_data_20XX_XX.20_.qX.csv is a series of data sets.
+
+# end
+
 library(tidyverse)
 library(dplyr)
 library(rgdal)
@@ -175,6 +185,21 @@ AggregatedFunction(year = "2020", month = "04",
 load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata")
 AggregatedFunction(year = "2020", month = "05",
                    valid_ID = valid_ID, cents.coords = cents.coords)
-load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") #next
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata")
 AggregatedFunction(year = "2020", month = "06",
+                   valid_ID = valid_ID, cents.coords = cents.coords)
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata")
+AggregatedFunction(year = "2020", month = "07",
+                   valid_ID = valid_ID, cents.coords = cents.coords)
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata")
+AggregatedFunction(year = "2020", month = "08",
+                   valid_ID = valid_ID, cents.coords = cents.coords)
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") 
+AggregatedFunction(year = "2020", month = "09",
+                   valid_ID = valid_ID, cents.coords = cents.coords)
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") #on
+AggregatedFunction(year = "2020", month = "10",
+                   valid_ID = valid_ID, cents.coords = cents.coords)
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") #next
+AggregatedFunction(year = "2020", month = "11",
                    valid_ID = valid_ID, cents.coords = cents.coords)
