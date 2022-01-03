@@ -200,9 +200,12 @@ AggregatedFunction(year = "2020", month = "09",
 load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") 
 AggregatedFunction(year = "2020", month = "10",
                    valid_ID = valid_ID, cents.coords = cents.coords)
-load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") #on
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") 
 AggregatedFunction(year = "2020", month = "11",
                    valid_ID = valid_ID, cents.coords = cents.coords)
-load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") #next
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") #on
 AggregatedFunction(year = "2020", month = "12",
+                   valid_ID = valid_ID, cents.coords = cents.coords)
+load("C:/11_Article/01_Data/02_ODMatrix/Temp2.Rdata") #next
+AggregatedFunction(year = "2021", month = "01",
                    valid_ID = valid_ID, cents.coords = cents.coords)

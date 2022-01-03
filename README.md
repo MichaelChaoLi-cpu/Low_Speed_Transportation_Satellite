@@ -10,3 +10,6 @@ WorldPop: 1km, yearly
   
 ## Code  
 [01_DW_GridRealMovementEstimation_v1.R](00_RCode/01_DW_GridRealMovementEstimation_v1.R): This script is to wash the data to get low speed transportation density from 2019.01 to 2021.01, a total of 25 months of the Great Tokyo Area. 
+
+## Current Platform
+Right
