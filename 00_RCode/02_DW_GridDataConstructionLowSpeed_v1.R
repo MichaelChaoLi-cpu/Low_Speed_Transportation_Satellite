@@ -73,7 +73,7 @@ for (month in month_list) {
 for (month in month_list) {
   mesh_grid <- makingMeshWithDensity("2020", month, filelist.csv, mesh_grid)
 }
-
+mesh_grid <- makingMeshWithDensity("2021", "01", filelist.csv, mesh_grid)
 
 # here is to test the raster
 centroids_mesh <- gCentroid(mesh_grid, byid = T, id = mesh_grid$GridID)
@@ -81,10 +81,23 @@ points_mesh <- coordinates(centroids_mesh) %>% as.data.frame()
 points_mesh <- cbind(points_mesh, mesh_grid@data)
 xy <- points_mesh[,c(1,2)]
 proj <- mesh_grid@proj4string
-points_mesh <- SpatialPointsDataFrame(coords = xy, data = ,
+points_mesh <- SpatialPointsDataFrame(coords = xy, data = points_mesh,
                                       proj4string = proj)
-points_mesh.raster <- SpatialPixelsDataFrame(points = xy, data = points_mesh@data, tolerance = 0.15)
-points_mesh.raster <- as(points_mesh.raster, "SpatialGridDataFrame")
-points_mesh.raster@data <- points_mesh.raster@data %>% dplyr::select(Density)
-points_mesh.raster <- raster(points_mesh.raster)
-plot(points_mesh.raster)
+points_mesh.raster.ori <- SpatialPixelsDataFrame(points = xy, data = points_mesh@data, tolerance = 0.15)
+points_mesh.raster.ori <- as(points_mesh.raster.ori, "SpatialGridDataFrame")
+key_variable <- colnames(points_mesh.raster.ori@data)
+key_variable <- key_variable[4:length(key_variable)]
+
+setwd("C:/Users/li.chao.987@s.kyushu-u.ac.jp/OneDrive - Kyushu University/11_Article/03_RStudio")
+predict_jpg_folder <- "01_Figure/00_DensityTest/"
+for (variable in key_variable){
+  points_mesh.raster <- points_mesh.raster.ori
+  points_mesh.raster@data <- points_mesh.raster@data %>% dplyr::select(variable %>% as.character())
+  points_mesh.raster <- raster(points_mesh.raster)
+  brks = c(0, 1000, 10000, 100000, 1000000, 10000000)
+  pal <- colorRampPalette(c("blue","green","yellow","red"))
+  jpeg(paste0(predict_jpg_folder,variable %>% as.character(),".jpg"), 
+       quality = 300, width = 1300, height = 1000)
+  plot(points_mesh.raster, breaks = brks, col = pal(6))
+  dev.off()
+}
