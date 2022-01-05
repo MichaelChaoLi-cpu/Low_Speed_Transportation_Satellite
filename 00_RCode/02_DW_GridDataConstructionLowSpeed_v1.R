@@ -12,6 +12,7 @@ library(rgdal)
 library(stringr)
 library(rgeos)
 library(raster)
+library(magick)
 
 setwd("D:/11_Article/01_Data/04_WashedData")
 filelist <- list.files()
@@ -99,5 +100,13 @@ for (variable in key_variable){
   jpeg(paste0(predict_jpg_folder,variable %>% as.character(),".jpg"), 
        quality = 300, width = 1300, height = 1000)
   plot(points_mesh.raster, breaks = brks, col = pal(6))
+  title(variable)
   dev.off()
 }
+
+jpg.list <- list.files(predict_jpg_folder)
+frames <- paste0(predict_jpg_folder, jpg.list)
+m <- image_read(frames)
+m <- image_animate(m, fps = 2)
+image_write(m, 
+            paste0("01_Figure/", "ani.gif"))
