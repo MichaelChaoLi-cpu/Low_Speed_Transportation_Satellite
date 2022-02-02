@@ -74,7 +74,7 @@ for (month in month_list) {
 for (month in month_list) {
   mesh_grid <- makingMeshWithDensity("2020", month, filelist.csv, mesh_grid)
 }
-mesh_grid <- makingMeshWithDensity("2021", "01", filelist.csv, mesh_grid)
+#mesh_grid <- makingMeshWithDensity("2021", "01", filelist.csv, mesh_grid)
 
 # here is to test the raster
 centroids_mesh <- gCentroid(mesh_grid, byid = T, id = mesh_grid$GridID)
