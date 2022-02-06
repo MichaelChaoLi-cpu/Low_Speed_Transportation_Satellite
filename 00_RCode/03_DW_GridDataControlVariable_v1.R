@@ -8,6 +8,7 @@ library(rgdal)
 library(stringr)
 library(rgeos)
 library(raster)
+library(plm)
 
 extractPointDataFromRaster <- function(RasterFolder, filelist, cityLocationSpatialPoint,
                                        year_start_location, month_start_location, flip_reverse = T,
@@ -63,4 +64,55 @@ NDVIRasterFolder <- "D:\\11_Article\\01_Data\\03_NDVI\\VI_16Days_250m_v6\\NDVI\\
 filelist <- list.files(NDVIRasterFolder)
 NDVIRasterDataset <- 
   extractPointDataFromRaster(NDVIRasterFolder, filelist, points_mesh,
-                             14, 18, F, "NDVI", 17, 20)
+                             14, 19, F, "NDVI", 17, 21)
+save(NDVIRasterDataset, file = "04_Data/06_NDVIRasterDataset.RData")
+
+#get day temperature
+dayTempRasterFolder <- "D:\\11_Article\\01_Data\\06_Tempature\\Surf_Temp_Monthly_005dg_v6\\LST_Day_CMG\\"
+filelist <- list.files(dayTempRasterFolder)
+dayTempRasterDataset <- 
+  extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh,
+                             21, month_start_location = 26, F,
+                             "dayTimeTemperature", month_end_location = 28)
+dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset$dayTimeTemperature,
+                                     by = list(dayTempRasterDataset$GridID, dayTempRasterDataset$year,
+                                               dayTempRasterDataset$month), FUN = mean, na.rm = T) 
+colnames(dayTempRasterDataset.ag) <- c("GridID", "year", "month", "dayTimeTemperature")
+save(dayTempRasterDataset.ag, file = "04_Data/03_dayTempRasterDataset.ag.RData")
+
+#get monthly Nighttime temperature from the MOD11C3 0.25 arc degree
+nightTimeTemperatureRasterFolder <- "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Night_CMG/"
+filelist <- list.files(nightTimeTemperatureRasterFolder)
+nightTimeTemperatureRasterDataset <- 
+  extractPointDataFromRaster(nightTimeTemperatureRasterFolder, filelist, points_mesh,
+                             23, month_start_location = 28, F,
+                             "nightTimeTemperature", month_end_location = 30)
+nightTimeTemperatureRasterDataset.ag <- aggregate(nightTimeTemperatureRasterDataset$dayTimeTemperature,
+                                     by = list(nightTimeTemperatureRasterDataset$GridID, 
+                                               nightTimeTemperatureRasterDataset$year,
+                                               nightTimeTemperatureRasterDataset$month), FUN = mean, na.rm = T) 
+colnames(nightTimeTemperatureRasterDataset.ag) <- c("GridID", "year", "month", "dayTimeTemperature")
+save(nightTimeTemperatureRasterDataset.ag, file = "04_Data/04_nightTimeTemperatureRasterDataset.ag.RData")
+
+#Nighttime Light
+NTLRasterFolder <- "D:/11_Article/01_Data/05_NTL/NTL_Raster/temp/"
+filelist <- list.files(NTLRasterFolder)
+NTLRasterDataset <- 
+  extractPointDataFromRaster(NTLRasterFolder, filelist, points_mesh,
+                             11, 15, F, "NTL")
+save(NTLRasterDataset, file = "04_Data/05_NTLRasterDataset.RData")
+
+
+load("04_Data/02_panelLowSpeedDensityDataset.RData")
+dataset_used <- left_join(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, 
+                          by = c("GridID", "year", "month"))
+dataset_used$time <- dataset_used$year * 100 + dataset_used$month
+
+pdata <- pdata.frame(dataset_used, index = c("GridID", "time"))
+formula <- lowSpeedDensity ~ dayTimeTemperature
+ols <- plm(formula, pdata, model = "pooling")
+summary(ols)
+fem <- plm(formula, pdata, model = "within")
+summary(fem)
+rem <- plm(formula, pdata, model = "random")
+summary(rem)
