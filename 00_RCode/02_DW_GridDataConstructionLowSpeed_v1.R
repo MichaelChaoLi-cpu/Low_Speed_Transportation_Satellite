@@ -4,6 +4,19 @@
 # raw_data_20XX_XX.20_.qX.csv: "Group.1" this is the grid id to finish spatial join.
 # raw_data_20XX_XX.20_.qX.csv: "x" estimation of the flow on a certain grid.
 
+# output: 01_MeshPointData.RData (points_mesh)
+# points_mesh: "x" longitude
+# points_mesh: "y" latitude
+# points_mesh: "GridID" ID
+# points_mesh: "Density20XXXX" low-speed transportation in 20XX XX month of a certain grid
+# note: this is a spatial data frame (sp point data frame)
+
+# output: 02_panelLowSpeedDensityDataset.RData
+# panelLowSpeedDensityDataset: "GridID" ID
+# panelLowSpeedDensityDataset: "lowSpeedDensity" low speed density
+# panelLowSpeedDensityDataset: "year" year
+# panelLowSpeedDensityDataset: "month" month
+
 # end
 
 library(tidyverse)
@@ -84,12 +97,25 @@ xy <- points_mesh[,c(1,2)]
 proj <- mesh_grid@proj4string
 points_mesh <- SpatialPointsDataFrame(coords = xy, data = points_mesh,
                                       proj4string = proj)
+
+lowSpeedDensityDataset <- points_mesh@data
+save(lowSpeedDensityDataset, file = "04_Data/01_MeshPointData.RData")
+panelLowSpeedDensityDataset <- lowSpeedDensityDataset %>%
+  dplyr::select(-x, -y) %>%
+  pivot_longer(!GridID, names_to = "TimeVariable", values_to = "lowSpeedDensity")
+panelLowSpeedDensityDataset <- panelLowSpeedDensityDataset %>%
+  mutate(year = str_sub(TimeVariable, 8, 11),
+         month = str_sub(TimeVariable, 12, 13)) 
+panelLowSpeedDensityDataset$year <- panelLowSpeedDensityDataset$year %>% as.numeric()
+panelLowSpeedDensityDataset$month <- panelLowSpeedDensityDataset$month %>% as.numeric()
+save(panelLowSpeedDensityDataset, file = "04_Data/02_panelLowSpeedDensityDataset.RData")
+
 points_mesh.raster.ori <- SpatialPixelsDataFrame(points = xy, data = points_mesh@data, tolerance = 0.15)
 points_mesh.raster.ori <- as(points_mesh.raster.ori, "SpatialGridDataFrame")
 key_variable <- colnames(points_mesh.raster.ori@data)
 key_variable <- key_variable[4:length(key_variable)]
 
-setwd("C:/Users/li.chao.987@s.kyushu-u.ac.jp/OneDrive - Kyushu University/11_Article/03_RStudio")
+setwd("C:/Users/li.chao.987@s.kyushu-u.ac.jp/OneDrive - Kyushu University/11_Article/03_RStudio/")
 predict_jpg_folder <- "01_Figure/00_DensityTest/"
 for (variable in key_variable){
   points_mesh.raster <- points_mesh.raster.ori
