@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+04_Data/05_NTLRasterDataset.RData
+04_Data/06_NDVIRasterDataset.RData
+04_Data/07_terrainPressureRasterDatasett.RData
+04_Data/08_humidityRasterDataset.RData
