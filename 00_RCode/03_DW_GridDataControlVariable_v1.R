@@ -59,6 +59,8 @@ xy <- points_mesh[,c(1,2)]
 proj <- mesh_grid@proj4string
 points_mesh <- SpatialPointsDataFrame(coords = xy, data = points_mesh,
                                       proj4string = proj)
+rm(mesh_grid)
+rm(mesh_grid.ori)
 #get ndvi
 NDVIRasterFolder <- "D:\\11_Article\\01_Data\\03_NDVI\\VI_16Days_250m_v6\\NDVI\\"
 filelist <- list.files(NDVIRasterFolder)
@@ -93,6 +95,13 @@ dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset$dayTimeTemperature,
                                      by = list(dayTempRasterDataset$GridID, dayTempRasterDataset$year,
                                                dayTempRasterDataset$month), FUN = mean, na.rm = T) 
 colnames(dayTempRasterDataset.ag) <- c("GridID", "year", "month", "dayTimeTemperature")
+dayTempRasterDataset.ag$date <- 
+  as.Date((dayTempRasterDataset.ag$month - 1),
+          origin = paste0(dayTempRasterDataset.ag$year,"-01-01")) %>% as.character()
+dayTempRasterDataset.ag$month <- str_sub(dayTempRasterDataset.ag$date, 6, 7) %>% as.numeric()
+dayTempRasterDataset.ag <- dayTempRasterDataset.ag %>% dplyr::select(-date)
+dayTempRasterDataset.ag$dayTimeTemperature <- dayTempRasterDataset.ag$dayTimeTemperature *
+  0.02 - 273.16
 save(dayTempRasterDataset.ag, file = "04_Data/03_dayTempRasterDataset.ag.RData")
 
 #get monthly Nighttime temperature from the MOD11C3 0.005 arc degree
@@ -107,6 +116,13 @@ nightTimeTemperatureRasterDataset.ag <- aggregate(nightTimeTemperatureRasterData
                                                nightTimeTemperatureRasterDataset$year,
                                                nightTimeTemperatureRasterDataset$month), FUN = mean, na.rm = T) 
 colnames(nightTimeTemperatureRasterDataset.ag) <- c("GridID", "year", "month", "nightTimeTemperature")
+nightTimeTemperatureRasterDataset.ag$date <- 
+  as.Date((nightTimeTemperatureRasterDataset.ag$month - 1),
+          origin = paste0(nightTimeTemperatureRasterDataset.ag$year,"-01-01")) %>% as.character()
+nightTimeTemperatureRasterDataset.ag$month <- str_sub(nightTimeTemperatureRasterDataset.ag$date, 6, 7) %>% as.numeric()
+nightTimeTemperatureRasterDataset.ag <- nightTimeTemperatureRasterDataset.ag %>% dplyr::select(-date)
+nightTimeTemperatureRasterDataset.ag$nightTimeTemperature <- nightTimeTemperatureRasterDataset.ag$nightTimeTemperature *
+  0.02 - 273.16  #convert into c degree temperature
 save(nightTimeTemperatureRasterDataset.ag, file = "04_Data/04_nightTimeTemperatureRasterDataset.ag.RData")
 
 #Nighttime Light
@@ -125,6 +141,7 @@ terrainPressureRasterDataset <-
                              21, 26, T, "ter_pressure")
 save(terrainPressureRasterDataset, file = "04_Data/07_terrainPressureRasterDatasett.RData")
 
+#get monthly water vapor from the GLDAS_NOAH025_M 0.25 arc degree 
 # Point based
 humidityRasterFolder <- "D:/10_Article/09_TempOutput/06_MonthlyVaporTif/Add025Outline/"
 filelist <- list.files(humidityRasterFolder)
@@ -137,34 +154,64 @@ humidityRasterDataset <- humidityRasterDataset %>% as.data.frame()
 humidityRasterDataset <- humidityRasterDataset %>%
   filter(year > 2018) %>%
   filter(year < 2021)
-humidityRasterDataset %>% 
-  save(file = "04_Data/08_humidityRasterDataset.RData")
+
+save(humidityRasterDataset, file = "04_Data/08_humidityRasterDataset.RData")
 # 1 g/kg means 1 gram water in the 1 kg air.
 
-load("04_Data/02_panelLowSpeedDensityDataset.RData")
-load("04_Data/03_dayTempRasterDataset.ag.RData")
-load("04_Data/04_nightTimeTemperatureRasterDataset.ag.RData")
-load("04_Data/05_NTLRasterDataset.RData")
-load("04_Data/06_NDVIRasterDataset.RData")
-load("04_Data/07_terrainPressureRasterDatasett.RData")
-dataset_used <- left_join(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, nightTimeTemperatureRasterDataset.ag, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, NTLRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, terrainPressureRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, NDVIRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used$time <- dataset_used$year * 100 + dataset_used$month
+#get monthly precipitation from the GLDAS_NOAH025_M 0.25 arc degree
+# Point Based
+precipitationRasterFolder <- "D:/10_Article/09_TempOutput/07_MonthlyPrecipitationTif/Add025Outline/"
+filelist <- list.files(precipitationRasterFolder)
+precipitationRasterDataset <- 
+  extractPointDataFromRaster(precipitationRasterFolder, filelist, points_mesh,
+                             27, 31, T, "precipitation")
+precipitationRasterDataset$precipitation <- precipitationRasterDataset$precipitation * 3600 
+precipitationRasterDataset <- precipitationRasterDataset %>% as.data.frame()
+precipitationRasterDataset <- precipitationRasterDataset %>%
+  filter(year > 2018) %>%
+  filter(year < 2021)
+save(precipitationRasterDataset, file = "04_Data/09_precipitationRasterDataset.RData")
+# now, the precipitation unit is kg/(m2 * h)  
 
-pdata <- pdata.frame(dataset_used, index = c("GridID", "time"))
-formula <- lowSpeedDensity ~ dayTimeTemperature + nightTimeTemperature + NTL + 
-  ter_pressure + NDVI
-ols <- plm(formula, pdata, model = "pooling")
-summary(ols)
-fem <- plm(formula, pdata, model = "within")
-summary(fem)
-rem <- plm(formula, pdata, model = "random")
-summary(rem)
+#get monthly speed wind from the GLDAS_NOAH025_M 0.25 arc degree
+# point based
+speedWindRasterFolder <- "D:/10_Article/09_TempOutput/09_WindSpeed/Add025Outline/"
+filelist <- list.files(speedWindRasterFolder)
+speedWindRasterDataset <- 
+  extractPointDataFromRaster(speedWindRasterFolder, filelist, points_mesh,
+                             19, 23, T, "speedwind")
+speedWindRasterDataset <- speedWindRasterDataset %>% as.data.frame()
+speedWindRasterDataset <- speedWindRasterDataset %>%
+  filter(year > 2018) %>%
+  filter(year < 2021)
+save(speedWindRasterDataset, file = "04_Data/10_speedWindRasterDataset.RData")
+# now, the speed wind unit is m/s  
+
+#get monthly troposphere no2 from the OMNO2G, band 9(troposphere no2)
+troposphereNo2RasterFolder <- "D:/10_Article/09_TempOutput/02_MonthlyTroposphericNo2Tif/"
+filelist <- list.files(troposphereNo2RasterFolder)
+troposphereNo2RasterDataset <- 
+  extractPointDataFromRaster(troposphereNo2RasterFolder, filelist, points_mesh,
+                             21, 26, T, "raw_no2")
+# convert molecular / cm2 to ug / m2
+mol_g = 6.022140857 * 10^23  # mol
+troposphereNo2RasterDataset$g_cm2 <- troposphereNo2RasterDataset$raw_no2 / mol_g * 46.0055 # convert mol to g
+troposphereNo2RasterDataset$mg_m2_troposphere_no2 <- troposphereNo2RasterDataset$g_cm2 * 10000 * 1000 # conver /cm2 to /m2 and g to mg
+troposphereNo2RasterDataset <- troposphereNo2RasterDataset %>% dplyr::select("GridID", "year", "month", "mg_m2_troposphere_no2")
+troposphereNo2RasterDataset$Date <- as.Date(
+  paste0(as.character(troposphereNo2RasterDataset$year),"-",as.character(troposphereNo2RasterDataset$month),"-01")
+)
+troposphereNo2RasterDataset <- troposphereNo2RasterDataset %>%
+  dplyr::select(-Date)
+troposphereNo2RasterDataset <- troposphereNo2RasterDataset %>%
+  filter(year > 2018) %>%
+  filter(year < 2021)
+save(troposphereNo2RasterDataset, file = "04_Data/11_troposphereNo2RasterDataset.RData")
+
+# get monthly Ozone, 0.25 * 0.25
+ozoneRasterLayer <- "D:/10_Article/09_TempOutput/14_MonthlyOzone/"
+filelist <- list.files(ozoneRasterLayer)
+filelist <- filelist[49:72]
+ozoneRasterDataset <- 
+  extractPointDataFromRaster(ozoneRasterLayer, filelist, points_mesh,
+                             21, 26, T, "ozone")
