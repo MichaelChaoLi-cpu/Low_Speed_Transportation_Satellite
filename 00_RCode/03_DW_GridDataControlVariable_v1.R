@@ -62,7 +62,7 @@ points_mesh <- SpatialPointsDataFrame(coords = xy, data = points_mesh,
 rm(mesh_grid)
 rm(mesh_grid.ori)
 #get ndvi
-NDVIRasterFolder <- "D:\\11_Article\\01_Data\\03_NDVI\\VI_16Days_250m_v6\\NDVI\\"
+NDVIRasterFolder <- "D:\\11_Article\\01_Data\\03_NDVI\\VI_Monthly_005dg_v6\\NDVI_Ext\\"
 filelist <- list.files(NDVIRasterFolder)
 NDVIRasterDataset <- 
   extractPointDataFromRaster(NDVIRasterFolder, filelist, points_mesh,
@@ -85,7 +85,7 @@ NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI * 100 #convert into from 100% t
 save(NDVIRasterDataset, file = "04_Data/06_NDVIRasterDataset.RData")
 
 #get day temperature
-dayTempRasterFolder <- "D:\\11_Article\\01_Data\\06_Tempature\\Surf_Temp_Monthly_005dg_v6\\LST_Day_CMG\\"
+dayTempRasterFolder <- "D:\\11_Article\\01_Data\\06_Tempature\\Surf_Temp_Monthly_005dg_v6\\LST_Day_CMG_Ext\\"
 filelist <- list.files(dayTempRasterFolder)
 dayTempRasterDataset <- 
   extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh,
@@ -105,7 +105,7 @@ dayTempRasterDataset.ag$dayTimeTemperature <- dayTempRasterDataset.ag$dayTimeTem
 save(dayTempRasterDataset.ag, file = "04_Data/03_dayTempRasterDataset.ag.RData")
 
 #get monthly Nighttime temperature from the MOD11C3 0.005 arc degree
-nightTimeTemperatureRasterFolder <- "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Night_CMG/"
+nightTimeTemperatureRasterFolder <- "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Night_CMG_Ext/"
 filelist <- list.files(nightTimeTemperatureRasterFolder)
 nightTimeTemperatureRasterDataset <- 
   extractPointDataFromRaster(nightTimeTemperatureRasterFolder, filelist, points_mesh,
@@ -215,3 +215,24 @@ filelist <- filelist[49:72]
 ozoneRasterDataset <- 
   extractPointDataFromRaster(ozoneRasterLayer, filelist, points_mesh,
                              21, 26, T, "ozone")
+save(ozoneRasterDataset, file = "04_Data/12_TotalOzoneDURasterDataset.RData")
+
+# get monthly UV Aerosol Index, 0.25 * 0.25
+UVAerosolIndexRasterLayer <- "D:/10_Article/09_TempOutput/15_MonthlyUVAerosolIndex/"
+filelist <- list.files(UVAerosolIndexRasterLayer)
+filelist <- filelist[49:72]
+UVAerosolIndexRasterDataset <- 
+  extractPointDataFromRaster(UVAerosolIndexRasterLayer, filelist, points_mesh,
+                             21, 26, T, "UVAerosolIndex")
+save(UVAerosolIndexRasterDataset, file = "04_Data/13_UVAerosolIndexRasterDataset.RData")
+# get monthly UV Aerosol Index, 0.25 * 0.25
+
+#get monthly planetary boundary layer height, 0.25 * 0.25 
+PBLHRasterLayer <- "D:/10_Article/09_TempOutput/10_PlanetaryBoundaryLayerHeight/Resample/"
+filelist <- list.files(PBLHRasterLayer)
+filelist <- filelist[49:72]
+PBLHRasterDataset <- 
+  extractPointDataFromRaster(PBLHRasterLayer, filelist, points_mesh,
+                             1, 5, F, "PBLH")
+save(PBLHRasterDataset, file = "04_Data/14_PBLHRasterDataset.RData")
+#get monthly planetary boundary layer height, 0.25 * 0.25 
