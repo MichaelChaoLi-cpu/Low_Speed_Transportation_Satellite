@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+04_Data/00_*.RData
 04_Data/03_*.RData
 04_Data/04_*.RData
 04_Data/05_NTLRasterDataset.RData

@@ -236,3 +236,22 @@ PBLHRasterDataset <-
                              1, 5, F, "PBLH")
 save(PBLHRasterDataset, file = "04_Data/14_PBLHRasterDataset.RData")
 #get monthly planetary boundary layer height, 0.25 * 0.25 
+
+setwd("D:/09_Article/02_Shapefile/N03-20210101_GML")
+GT_map <- readOGR(dsn = ".", layer = "GreatTokyo")
+GT_map <- spTransform(GT_map, proj)
+setwd("C:/Users/li.chao.987@s.kyushu-u.ac.jp/OneDrive - Kyushu University/11_Article/03_RStudio/")
+
+GT_map@data$PrefID <- str_sub(GT_map@data$N03_007, 1, 2) 
+
+GT_map@data <- GT_map@data %>% dplyr::select("PrefID") 
+GT.in.grid <- over(points_mesh, GT_map)
+
+points_mesh.in.GT <- cbind(points_mesh@data, GT.in.grid)
+points_mesh.in.GT <- points_mesh.in.GT %>% filter(!is.na(PrefID))
+xy <- points_mesh.in.GT[,c(1,2)]
+points_mesh.in.GT <- SpatialPointsDataFrame(coords = xy, data = points_mesh.in.GT,
+                                      proj4string = proj)
+
+save(points_mesh, file = "04_Data/00_points_mesh.RData")
+save(points_mesh.in.GT, file = "04_Data/00_points_mesh.in.GT.RData")
