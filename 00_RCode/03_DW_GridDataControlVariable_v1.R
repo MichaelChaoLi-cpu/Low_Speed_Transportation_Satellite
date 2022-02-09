@@ -9,6 +9,9 @@ library(stringr)
 library(rgeos)
 library(raster)
 library(plm)
+library(COVID19)
+library(lubridate)
+library(stringr)
 
 extractPointDataFromRaster <- function(RasterFolder, filelist, cityLocationSpatialPoint,
                                        year_start_location, month_start_location, flip_reverse = T,
@@ -255,3 +258,133 @@ points_mesh.in.GT <- SpatialPointsDataFrame(coords = xy, data = points_mesh.in.G
 
 save(points_mesh, file = "04_Data/00_points_mesh.RData")
 save(points_mesh.in.GT, file = "04_Data/00_points_mesh.in.GT.RData")
+
+deat.conf.pop <- COVID19::covid19(country = "JP", level = 2)
+
+test <- deat.conf.pop %>% 
+  dplyr::select("id", "date", "confirmed", "deaths") %>%
+  as.data.frame()
+test <- plm::pdata.frame(test, index = c("id", "date"))
+test$confirmed.dif <- test$confirmed - plm::lag(test$confirmed)
+test$deaths.dif <- test$deaths - plm::lag(test$deaths)
+test <- test %>% 
+  mutate(confirmed.dif = ifelse(confirmed.dif < 0, 0, confirmed.dif),
+         deaths.dif = ifelse(deaths.dif < 0, 0, deaths.dif)) %>% 
+  dplyr::select(-"confirmed", -"deaths")
+test <- lapply(test, function(x){attr(x, c("id", "date")) <- NULL; x}) %>% as.data.frame()
+test$id <- test$id %>% as.character()
+test$date <- test$date %>% as.character() %>% ymd()
+
+deat.conf.pop <- left_join(deat.conf.pop, test, by = c("id", "date"))
+rm(test)
+
+sub.Dataset.M <- function(dataset, input_date){
+  dataset.id <- dataset %>% filter(date == ymd("2021-08-01")) %>%
+    dplyr::select(id, population)
+  input_date <- ymd(input_date)
+  base_month = input_date %m-% months(1)
+  dataset.output <- dataset %>% 
+    dplyr::select(id, date, population, confirmed.dif, deaths.dif) %>%
+    filter(ymd(date) < input_date,
+           ymd(date) >= base_month) %>%
+    as.data.frame()
+  dataset.output <- dataset.output %>% 
+    group_by(id) %>% 
+    summarise(confirmed = sum(confirmed.dif, na.rm = T),
+              deaths = sum(deaths.dif, na.rm = T))
+  dataset.output <- left_join(dataset.id, dataset.output, by = "id")
+  dataset.output <- dataset.output %>% 
+    mutate(
+      confirmed = ifelse(is.na(confirmed), 0, confirmed),
+      deaths = ifelse(is.na(deaths), 0, deaths)
+    )
+  stringency <- dataset %>% filter(date > ymd(base_month)) %>%
+    filter(date < ymd(input_date)) %>%
+    dplyr::select(id, stringency_index)
+  stringency <- stringency$stringency_index %>% 
+    aggregate(by = list(stringency$id), mean)
+  stringency <- stringency %>% rename(id = Group.1)
+  dataset.output <- left_join(dataset.output, stringency, by = "id") 
+  dataset.output$date <- ymd(base_month)
+  colnames(dataset.output) <- c("id", "population", "confirmed", "deaths", 
+                                "stringency_index", "date")
+  dataset.output <- dataset.output %>% 
+    mutate(
+      stringency_index = ifelse(is.na(stringency_index), 0, stringency_index)
+    )
+  return(dataset.output)
+}
+
+deat.conf.pop.202001 <- sub.Dataset.M(deat.conf.pop, "2020-02-01")
+deat.conf.pop.202002 <- sub.Dataset.M(deat.conf.pop, "2020-03-01")
+deat.conf.pop.202003 <- sub.Dataset.M(deat.conf.pop, "2020-04-01")
+deat.conf.pop.202004 <- sub.Dataset.M(deat.conf.pop, "2020-05-01")
+deat.conf.pop.202005 <- sub.Dataset.M(deat.conf.pop, "2020-06-01")
+deat.conf.pop.202006 <- sub.Dataset.M(deat.conf.pop, "2020-07-01")
+deat.conf.pop.202007 <- sub.Dataset.M(deat.conf.pop, "2020-08-01")
+deat.conf.pop.202008 <- sub.Dataset.M(deat.conf.pop, "2020-09-01")
+deat.conf.pop.202009 <- sub.Dataset.M(deat.conf.pop, "2020-10-01")
+deat.conf.pop.202010 <- sub.Dataset.M(deat.conf.pop, "2020-11-01")
+deat.conf.pop.202011 <- sub.Dataset.M(deat.conf.pop, "2020-12-01")
+deat.conf.pop.202012 <- sub.Dataset.M(deat.conf.pop, "2021-01-01")
+
+merge_df.M <- rbind(
+  deat.conf.pop.202001, deat.conf.pop.202002,
+  deat.conf.pop.202003, deat.conf.pop.202004, deat.conf.pop.202005,
+  deat.conf.pop.202006, deat.conf.pop.202007, deat.conf.pop.202008,
+  deat.conf.pop.202009, deat.conf.pop.202010, deat.conf.pop.202011,
+  deat.conf.pop.202012
+)
+rm(
+  deat.conf.pop.202001, deat.conf.pop.202002,
+  deat.conf.pop.202003, deat.conf.pop.202004, deat.conf.pop.202005,
+  deat.conf.pop.202006, deat.conf.pop.202007, deat.conf.pop.202008,
+  deat.conf.pop.202009, deat.conf.pop.202010, deat.conf.pop.202011,
+  deat.conf.pop.202012
+)
+dataset.id <- deat.conf.pop %>% filter(date == ymd("2021-08-01"))
+dataset.id <- dataset.id %>% dplyr::select(id, key_local) %>% as.data.frame()
+merge_df.M <- left_join(merge_df.M, dataset.id)
+merge_df.M <- merge_df.M %>% rename(PrefID = key_local)
+rm(dataset.id)
+
+merge_df.M$prevalance <- merge_df.M$confirmed / merge_df.M$population * 100
+merge_df.M$mortality <- merge_df.M$deaths / merge_df.M$population * 100
+
+setwd("D:/09_Article/02_Shapefile/N03-20210101_GML")
+GT_map <- readOGR(dsn = ".", layer = "GreatTokyo")
+GT_map <- spTransform(GT_map, proj)
+setwd("C:/Users/li.chao.987@s.kyushu-u.ac.jp/OneDrive - Kyushu University/11_Article/03_RStudio/")
+
+load("04_Data/00_points_mesh.in.GT.RData")
+GT_map@data$PrefID <- str_sub(GT_map@data$N03_007, 1, 2) 
+
+GT_map@data <- GT_map@data %>% dplyr::select("PrefID") 
+
+month.vector <- merge_df.M$date %>% unique()
+dataset.output <-  data.frame(Date=as.Date(character()),
+                              File=character(), 
+                              User=character(), 
+                              stringsAsFactors=FALSE) 
+loop = 1
+while (loop < (length(month.vector) + 1) ){
+  aimed.month <- month.vector[loop]
+  GT_map.month <- GT_map
+  GT_map.month@data <- left_join(GT_map.month@data, merge_df.M %>% filter(date == ymd(aimed.month))) %>%
+    dplyr::select(prevalance, mortality)
+  
+  covid19.grid <- over(points_mesh.in.GT, GT_map.month)
+  covid19.grid <- cbind(points_mesh.in.GT@data, covid19.grid)
+  covid19.grid <- covid19.grid %>% dplyr::select(GridID, prevalance, mortality)
+  covid19.grid$year <- str_sub(aimed.month, 1, 4) %>% as.numeric()
+  covid19.grid$month <- str_sub(aimed.month, 6, 7) %>% as.numeric()
+  dataset.output <- rbind(dataset.output, covid19.grid)
+  loop = loop + 1
+}
+
+covid19PrefectureData <- dataset.output 
+covid19PrefectureData$emergence <- 0 
+covid19PrefectureData <- covid19PrefectureData %>%
+  mutate(emergence = ifelse(month == 4, 0.8333, emergence),
+         emergence = ifelse(month == 5, 0.6774, emergence))
+save(covid19PrefectureData, file = "04_Data/15_covid19PrefectureData.RData")

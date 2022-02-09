@@ -45,12 +45,7 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
   ID <- dplyr::select(data, "id")
   .N <- 0
   ID_num <- data.table::setDT(ID)[,list(Count = .N),names(ID)]
-  if(model == "within" )
-  {
-    data <- drop_ID_with_single_observation(data, ID_num)
-    ID <- dplyr::select(data, "id")
-    ID_num <- data.table::setDT(ID)[,list(Count = .N),names(ID)]
-  }
+
   
   # Judge the datasize of calculation
   if ((nrow(ID_num) > 1000) & !doParallel)
@@ -77,79 +72,6 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
   data <- dplyr::left_join(data, coord, by = "id")
   lvl1_data <- data # data put into calculation
   
-  if(human.set.range)
-  {
-    message("...............................................................................................\n",
-            "Now, the range of bandwidth selection is set by the user\n",
-            "We assume that the user is familiar with bandwidth selection, and uses this setting to reduce calculation time.\n",
-            "If not, please stop the current calculation, and set \"human.set.range\" as FALSE\n",
-            "...............................................................................................\n")
-    if(is.null(h.lower))
-    {
-      stop("Need to set the lower boundary (h.lower)!")
-    }
-    if(is.null(h.upper))
-    {
-      stop("Need to set the upper boundary (h.upper)!")
-    }
-    if(h.lower > h.upper)
-    {
-      stop("h.lower should be smaller than h.upper")
-    }
-    lower <- h.lower
-    upper <- h.upper
-  }
-  else
-  {
-    # decide upper and lower boundary
-    lower.freedom <- protect_model_with_enough_freedom(formula = formula, data = lvl1_data, ID_list = ID_num,
-                                                       index = index, p = p, longlat = longlat)
-    message("To make sure every subsample have enough freedom, the minimum number of individuals is ",lower.freedom, "\n")
-    if(adaptive)
-    {
-      upper <- nrow(ID_num)
-      lower <- lower.freedom + 1
-      if((model == "random")&(random.method == "swar"))
-      {
-        lower <- length(varibale_name_in_equation) + 1
-      }
-    }
-    else
-    {
-      b.box <- sp::bbox(dp.locat)
-      upper <- sqrt((b.box[1,2]-b.box[1,1])^2+(b.box[2,2]-b.box[2,1])^2)
-      lower <- upper/5000
-      if ((model == "random")&(random.method == "swar"))
-      {
-        lower <- protect_model_with_least_individuals(lvl1_data, ID_num, index, kernel, p, longlat,
-                                                      bw_panel = (length(varibale_name_in_equation) + 1))
-      }
-      else
-      {
-        lower <- protect_model_with_least_individuals(lvl1_data, ID_num, index,
-                                                      kernel, p, longlat, bw_panel = lower.freedom)
-      }
-    }
-    
-    if(bigdata)
-    {
-      upper <- upper * upperratio
-      lower <- lower
-    }
-    
-    if(bigdata)
-    {
-      message("You set the \"bigdata\" is: ", bigdata, ". The ratio is: ", upperratio, "\n",
-              "Now the lower boundary of the bandwidth selection is ", lower, ", and upper boundary is ", upper,".\n",
-              "Note: if the optimal bandwidth is close to the upper boundary, you need to increase the ratio.\n",
-              "However, you should also know that the larger ratio requires more memory. Please, balance them and enjoy your research.\n")
-    }
-    if(huge_data_size)
-    {
-      message("Data Prepared! Go!............................................\n")
-    }
-  }
-  message("The upper boundary is ", upper,", and the lower boundary is ", lower,"\n")
   if(doParallel)
   {
     message("..................................................................................\n")
