@@ -165,5 +165,5 @@ GWPR.FEM.CV.F.result <- GWPR(formula = formula, data = dataset_used.Tokyo%>%rena
                              model = "within")
 
 GWPR.FEM.CV.F.result$SDF@data %>% View()
-summary(GWPR.FEM.CV.F.result$SDF@data$prevalance_TVa %>% as.numeric())
-save(GWPR.FEM.CV.F.result, file = "03_Results/GWPR_FEM_CV_F_result_0035.Rdata")
+summary(GWPR.FEM.CV.F.result$SDF@data$temp_TVa %>% as.numeric())
+save(GWPR.FEM.CV.F.result, file = "03_Results/GWPR_FEM_CV_F_result_1.15.Rdata")
