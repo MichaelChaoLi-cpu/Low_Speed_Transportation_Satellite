@@ -64,3 +64,16 @@ GWPR.FEM.bandwidth <- # this is about fixed bandwidth
 GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
 save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.Stage2NTL.145.005.005.Rdata")
+
+GWPR.FEM.bandwidth = 1.20 ###
+################################ this is GWPR based on FEM
+points_mesh.in.Tokyo@data <- points_mesh.in.Tokyo@data %>% rename("id"="GridID")
+points_mesh.in.Tokyo@data <- points_mesh.in.Tokyo@data %>% dplyr::select(id)
+GWPR.FEM.CV.F.result.NTL <- GWPR(formula = formula, data = dataset_used.Tokyo%>%rename("id"="GridID"), index = c("id", "time"),
+                             SDF = points_mesh.in.Tokyo, bw = GWPR.FEM.bandwidth, adaptive = F,
+                             p = 2, effect = "individual", kernel = "bisquare", longlat = F, 
+                             model = "within")
+
+GWPR.FEM.CV.F.result.NTL$SDF@data %>% View()
+summary(GWPR.FEM.CV.F.result.NTL$SDF@data$lowSpeedDensity_TVa %>% as.numeric())
+save(GWPR.FEM.CV.F.result.NTL, file = "03_Results/GWPR_FEM_CV_F_result_NTL_1.20.Rdata")
