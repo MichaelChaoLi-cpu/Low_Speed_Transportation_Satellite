@@ -88,36 +88,39 @@ NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI / 10000  #convert into from 1 t
 NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI * 100 #convert into from 100% to -100% 
 save(NDVIRasterDataset, file = "04_Data/06_NDVIRasterDataset.RData")
 
-#get ndvi
-NDVIRasterFolder <- "D:\\11_Article\\01_Data\\03_NDVI\\VI_Monthly_005dg_v6\\NDVI_Ext\\"
-filelist <- list.files(NDVIRasterFolder)
-NDVIRasterDataset <- 
-  extractPointDataFromRaster(NDVIRasterFolder, filelist, points_mesh,
-                             14, 19, F, "NDVI", 17, 21)
-colnames(NDVIRasterDataset) <- c("GridID", "NDVI", "year", "month")
-NDVIRasterDataset$date <- 
-  as.Date((NDVIRasterDataset$month - 1),
-          origin = paste0(NDVIRasterDataset$year,"-01-01")) %>% as.character()
-NDVIRasterDataset$month <- str_sub(NDVIRasterDataset$date, 6, 7) %>% as.numeric()
-NDVIRasterDataset <- NDVIRasterDataset %>% dplyr::select(-date)
-NDVIRasterDataset <- aggregate(NDVIRasterDataset$NDVI,
-                               by = list(NDVIRasterDataset$GridID, 
-                                         NDVIRasterDataset$year, 
-                                         NDVIRasterDataset$month), 
-                               FUN = "mean", na.rm = T
-)
-colnames(NDVIRasterDataset) <- c("GridID", "year", "month", "NDVI")
-NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI / 10000  #convert into from 1 to -1 
-NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI * 100 #convert into from 100% to -100% 
-save(NDVIRasterDataset, file = "04_Data/06_NDVIRasterDataset.RData")
+run <- F
+if(run) {
+  #get ndvi
+  NDVIRasterFolder <- "D:\\11_Article\\01_Data\\03_NDVI\\VI_Monthly_005dg_v6\\NDVI_Ext\\"
+  filelist <- list.files(NDVIRasterFolder)
+  NDVIRasterDataset <- 
+    extractPointDataFromRaster(NDVIRasterFolder, filelist, points_mesh,
+                               14, 19, F, "NDVI", 17, 21)
+  colnames(NDVIRasterDataset) <- c("GridID", "NDVI", "year", "month")
+  NDVIRasterDataset$date <- 
+    as.Date((NDVIRasterDataset$month - 1),
+            origin = paste0(NDVIRasterDataset$year,"-01-01")) %>% as.character()
+  NDVIRasterDataset$month <- str_sub(NDVIRasterDataset$date, 6, 7) %>% as.numeric()
+  NDVIRasterDataset <- NDVIRasterDataset %>% dplyr::select(-date)
+  NDVIRasterDataset <- aggregate(NDVIRasterDataset$NDVI,
+                                 by = list(NDVIRasterDataset$GridID, 
+                                           NDVIRasterDataset$year, 
+                                           NDVIRasterDataset$month), 
+                                 FUN = "mean", na.rm = T
+  )
+  colnames(NDVIRasterDataset) <- c("GridID", "year", "month", "NDVI")
+  NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI / 10000  #convert into from 1 to -1 
+  NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI * 100 #convert into from 100% to -100% 
+  save(NDVIRasterDataset, file = "04_Data/06_NDVIRasterDataset.RData")
+}
 
-#get day temperature
-dayTempRasterFolder <- "D:\\11_Article\\01_Data\\06_Tempature\\Surf_Temp_Monthly_005dg_v6\\LST_Day_CMG_Ext\\"
+#get temperature
+dayTempRasterFolder <- "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/MergedMODIS/"
 filelist <- list.files(dayTempRasterFolder)
 dayTempRasterDataset <- 
   extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh,
-                             21, month_start_location = 26, F,
-                             "dayTimeTemperature", month_end_location = 28)
+                             6, month_start_location = 11, F,
+                             "Temperature", month_end_location = 13)
 dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset$dayTimeTemperature,
                                      by = list(dayTempRasterDataset$GridID, dayTempRasterDataset$year,
                                                dayTempRasterDataset$month), FUN = mean, na.rm = T) 
