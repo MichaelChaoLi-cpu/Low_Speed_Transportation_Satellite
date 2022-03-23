@@ -114,11 +114,12 @@ if(run) {
   save(NDVIRasterDataset, file = "04_Data/06_NDVIRasterDataset.RData")
 }
 
-#get temperature
+#get temperature 
+load("04_Data/00_points_mesh.in.Tokyo.RData")
 dayTempRasterFolder <- "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/MergedMODIS/"
 filelist <- list.files(dayTempRasterFolder)
 dayTempRasterDataset <- 
-  extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh,
+  extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh.in.Tokyo,
                              6, month_start_location = 11, F,
                              "Temperature", month_end_location = 13)
 dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset$dayTimeTemperature,
