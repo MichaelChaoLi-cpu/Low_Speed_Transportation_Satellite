@@ -122,39 +122,19 @@ dayTempRasterDataset <-
   extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh.in.Tokyo,
                              6, month_start_location = 11, F,
                              "Temperature", month_end_location = 13)
-dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset$dayTimeTemperature,
+dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset$Temperature,
                                      by = list(dayTempRasterDataset$GridID, dayTempRasterDataset$year,
                                                dayTempRasterDataset$month), FUN = mean, na.rm = T) 
-colnames(dayTempRasterDataset.ag) <- c("GridID", "year", "month", "dayTimeTemperature")
+colnames(dayTempRasterDataset.ag) <- c("GridID", "year", "month", "Temperature")
 dayTempRasterDataset.ag$date <- 
   as.Date((dayTempRasterDataset.ag$month - 1),
           origin = paste0(dayTempRasterDataset.ag$year,"-01-01")) %>% as.character()
 dayTempRasterDataset.ag$month <- str_sub(dayTempRasterDataset.ag$date, 6, 7) %>% as.numeric()
 dayTempRasterDataset.ag <- dayTempRasterDataset.ag %>% dplyr::select(-date)
-dayTempRasterDataset.ag$dayTimeTemperature <- dayTempRasterDataset.ag$dayTimeTemperature *
+dayTempRasterDataset.ag$Temperature <- dayTempRasterDataset.ag$Temperature *
   0.02 - 273.16
 save(dayTempRasterDataset.ag, file = "04_Data/03_dayTempRasterDataset.ag.RData")
 
-#get monthly Nighttime temperature from the MOD11C3 0.005 arc degree
-nightTimeTemperatureRasterFolder <- "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Night_CMG_Ext/"
-filelist <- list.files(nightTimeTemperatureRasterFolder)
-nightTimeTemperatureRasterDataset <- 
-  extractPointDataFromRaster(nightTimeTemperatureRasterFolder, filelist, points_mesh,
-                             23, month_start_location = 28, F,
-                             "nightTimeTemperature", month_end_location = 30)
-nightTimeTemperatureRasterDataset.ag <- aggregate(nightTimeTemperatureRasterDataset$nightTimeTemperature,
-                                     by = list(nightTimeTemperatureRasterDataset$GridID, 
-                                               nightTimeTemperatureRasterDataset$year,
-                                               nightTimeTemperatureRasterDataset$month), FUN = mean, na.rm = T) 
-colnames(nightTimeTemperatureRasterDataset.ag) <- c("GridID", "year", "month", "nightTimeTemperature")
-nightTimeTemperatureRasterDataset.ag$date <- 
-  as.Date((nightTimeTemperatureRasterDataset.ag$month - 1),
-          origin = paste0(nightTimeTemperatureRasterDataset.ag$year,"-01-01")) %>% as.character()
-nightTimeTemperatureRasterDataset.ag$month <- str_sub(nightTimeTemperatureRasterDataset.ag$date, 6, 7) %>% as.numeric()
-nightTimeTemperatureRasterDataset.ag <- nightTimeTemperatureRasterDataset.ag %>% dplyr::select(-date)
-nightTimeTemperatureRasterDataset.ag$nightTimeTemperature <- nightTimeTemperatureRasterDataset.ag$nightTimeTemperature *
-  0.02 - 273.16  #convert into c degree temperature
-save(nightTimeTemperatureRasterDataset.ag, file = "04_Data/04_nightTimeTemperatureRasterDataset.ag.RData")
 
 #Nighttime Light
 NTLRasterFolder <- "D:/11_Article/01_Data/05_NTL/NTL_Raster/temp/"

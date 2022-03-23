@@ -10,7 +10,7 @@ library(foreach)
 
 load("04_Data/02_panelLowSpeedDensityDataset.RData")
 load("04_Data/03_dayTempRasterDataset.ag.RData")
-load("04_Data/04_nightTimeTemperatureRasterDataset.ag.RData")
+#load("04_Data/04_nightTimeTemperatureRasterDataset.ag.RData")
 load("04_Data/05_NTLRasterDataset.RData")
 load("04_Data/06_NDVIRasterDataset.RData")
 load("04_Data/07_terrainPressureRasterDatasett.RData")
@@ -24,8 +24,8 @@ load("04_Data/14_PBLHRasterDataset.RData")
 load("04_Data/15_covid19PrefectureData.RData")
 dataset_used <- left_join(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, 
                           by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, nightTimeTemperatureRasterDataset.ag, 
-                          by = c("GridID", "year", "month"))
+#dataset_used <- left_join(dataset_used, nightTimeTemperatureRasterDataset.ag, 
+#                          by = c("GridID", "year", "month"))
 dataset_used <- left_join(dataset_used, NTLRasterDataset, 
                           by = c("GridID", "year", "month"))
 dataset_used <- left_join(dataset_used, terrainPressureRasterDataset, 
@@ -53,7 +53,7 @@ dataset_used <- dataset_used %>%
          mortality = ifelse(is.na(mortality), 0, mortality),
          emergence = ifelse(is.na(emergence), 0, emergence))
 
-rm(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, nightTimeTemperatureRasterDataset.ag,
+rm(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, 
    NTLRasterDataset, terrainPressureRasterDataset, NDVIRasterDataset, 
    humidityRasterDataset, precipitationRasterDataset, speedWindRasterDataset, 
    troposphereNo2RasterDataset, ozoneRasterDataset, UVAerosolIndexRasterDataset, 
@@ -61,8 +61,9 @@ rm(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, nightTimeTemperatureRas
 rm(covid19PrefectureData)
 
 dataset_used$time <- dataset_used$year * 100 + dataset_used$month
-dataset_used$temp <- (dataset_used$dayTimeTemperature + dataset_used$nightTimeTemperature ) / 2
-
+#dataset_used$temp <- (dataset_used$dayTimeTemperature + dataset_used$nightTimeTemperature ) / 2
+dataset_used$temp <- dataset_used$Temperature
+  
 save(dataset_used, file = "04_Data/00_datasetUsed.RData")
 
 load("04_Data/00_datasetUsed.RData")
@@ -89,7 +90,7 @@ formula <- lowSpeedDensity ~
   mg_m2_troposphere_no2 + ozone + UVAerosolIndex + PBLH +
   prevalance + emergence
 
-cor(dataset_used %>% dplyr::select(all.vars(formula)))
+cor(dataset_used %>% dplyr::select(all.vars(formula)) %>% na.omit())
 
 pdata <- pdata.frame(dataset_used, index = c("GridID", "time"))
 
@@ -124,7 +125,7 @@ points_mesh.in.Tokyo <- points_mesh.in.Tokyo %>%
 dataset_used.Tokyo <- left_join(points_mesh.in.Tokyo %>% dplyr::select(GridID),
                                 dataset_used)
 
-cor(dataset_used.Tokyo %>% dplyr::select(all.vars(formula)))
+cor(dataset_used.Tokyo %>% dplyr::select(all.vars(formula)) %>% na.omit())
 
 pdata <- pdata.frame(dataset_used.Tokyo , index = c("GridID", "time"))
 
@@ -144,6 +145,7 @@ rm(fem, ols, pdata, rem)
 xy <- points_mesh.in.Tokyo[,c(1,2)]
 points_mesh.in.Tokyo <- SpatialPointsDataFrame(coords = xy, data = points_mesh.in.Tokyo,
                                                proj4string = points_mesh.in.GT@proj4string)
+save(points_mesh.in.Tokyo, file = "04_Data/00_points_mesh.in.Tokyo.RData")
 
 # we exiamine from the GWPR based on fem 
 formula
