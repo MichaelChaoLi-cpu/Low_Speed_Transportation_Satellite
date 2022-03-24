@@ -153,8 +153,8 @@ GWPR.FEM.bandwidth <- # this is about fixed bandwidth
   bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
                          SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
                          upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
-                         kernel = "bisquare",doParallel = T, cluster.number = 15, gradientIncrecement = T,
-                         GI.step = 0.05, GI.upper = 1.5, GI.lower = 0.05)
+                         kernel = "bisquare",doParallel = T, cluster.number = 14, gradientIncrecement = T,
+                         GI.step = 0.005, GI.upper = 1.5, GI.lower = 0.02)
 #GWPR.FEM.bandwidth.step.list <- rbind(GWPR.FEM.bandwidth.step.list, GWPR.FEM.bandwidth)
 GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
