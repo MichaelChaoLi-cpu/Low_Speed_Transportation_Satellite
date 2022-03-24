@@ -122,15 +122,16 @@ dayTempRasterDataset <-
   extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh.in.Tokyo,
                              6, month_start_location = 11, F,
                              "Temperature", month_end_location = 13)
-dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset$Temperature,
-                                     by = list(dayTempRasterDataset$GridID, dayTempRasterDataset$year,
-                                               dayTempRasterDataset$month), FUN = mean, na.rm = T) 
-colnames(dayTempRasterDataset.ag) <- c("GridID", "year", "month", "Temperature")
+dayTempRasterDataset.ag <- dayTempRasterDataset
 dayTempRasterDataset.ag$date <- 
   as.Date((dayTempRasterDataset.ag$month - 1),
           origin = paste0(dayTempRasterDataset.ag$year,"-01-01")) %>% as.character()
 dayTempRasterDataset.ag$month <- str_sub(dayTempRasterDataset.ag$date, 6, 7) %>% as.numeric()
 dayTempRasterDataset.ag <- dayTempRasterDataset.ag %>% dplyr::select(-date)
+dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset.ag$Temperature,
+                                     by = list(dayTempRasterDataset.ag$GridID, dayTempRasterDataset.ag$year,
+                                               dayTempRasterDataset.ag$month), FUN = mean, na.rm = T) 
+colnames(dayTempRasterDataset.ag) <- c("GridID", "year", "month", "Temperature")
 dayTempRasterDataset.ag$Temperature <- dayTempRasterDataset.ag$Temperature *
   0.02 - 273.16
 save(dayTempRasterDataset.ag, file = "04_Data/03_dayTempRasterDataset.ag.RData")
