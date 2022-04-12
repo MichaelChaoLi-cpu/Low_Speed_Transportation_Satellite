@@ -1,3 +1,6 @@
+# Author: M.L.
+
+# end
 
 library(tidyverse)
 library(dplyr)
@@ -149,6 +152,7 @@ save(points_mesh.in.Tokyo, file = "04_Data/00_points_mesh.in.Tokyo.RData")
 
 # we exiamine from the GWPR based on fem 
 formula
+formula <- lowSpeedDensity_num ~ temp +  NDVI + prevalance + emergence
 GWPR.FEM.bandwidth <- # this is about fixed bandwidth
   bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
                          SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
