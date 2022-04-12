@@ -1,0 +1,8 @@
+module load intel/2020.1
+module use /home/exp/modulefiles
+module load exp-R/4.0.2-intel2020.1-mkl
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/home/exp/udunits/2.2.26/lib
+export LIBRARY_PATH=${LIBRARY_PATH}:/home/exp/udunits/2.2.26/lib
+export C_INCLUDE_PATH=/home/exp/udunits/2.2.26/include
+export PKG_CPPFLAGS="-I/home/exp/udunits/2.2.26/include"
+export PKG_LIBS="-L/home/exp/udunits/2.2.26/lib"
