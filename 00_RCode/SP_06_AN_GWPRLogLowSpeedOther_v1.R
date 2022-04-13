@@ -13,34 +13,22 @@ library(sp)
 library(doParallel)
 library(foreach)
 
-load("04_Data/00_datasetUsed.RData")
-load("04_Data/00_points_mesh.in.GT.RData")
 source("00_RCode/07_AF_GWPRBandwidthStepSelection_v1.R")
+points_mesh.in.Tokyo <- read.csv("04_Data/SP_00_points_mesh.in.Tokyo.RData")
+dataset_used.Tokyo <- read.csv("04_Data/SP_00_dataset_used.Tokyo.RData")
+proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
 
-data.in.GT <- points_mesh.in.GT@data %>% 
-  dplyr::select(GridID, PrefID)
-
-dataset_used <- left_join(dataset_used, data.in.GT)
-dataset_used <- dataset_used %>% filter(!is.na(PrefID))
-rm(data.in.GT)
-
-dataset_used$lowSpeedDensity_num <- dataset_used$lowSpeedDensity
-dataset_used$lowSpeedDensity <- log(dataset_used$lowSpeedDensity + 1)
+xy <- points_mesh.in.Tokyo[,c(1,2)]
+points_mesh.in.Tokyo <- SpatialPointsDataFrame(coords = xy, data = points_mesh.in.Tokyo,
+                                               proj4string = CRS(proj))
+message("data done")
 
 formula <- lowSpeedDensity ~ temp +  NDVI + prevalance + emergence
-points_mesh.in.Tokyo <- points_mesh.in.GT@data
-points_mesh.in.Tokyo <- points_mesh.in.Tokyo %>%
-  filter(PrefID == "13")
-
-dataset_used.Tokyo <- left_join(points_mesh.in.Tokyo %>% dplyr::select(GridID),
-                                dataset_used)
-
-load("04_Data/00_points_mesh.in.Tokyo.RData")
 
 ### search log movement bandwidth for 0.02 to 0.50, step is 0.005 
 not_get_result <- T
 if(not_get_result){
-  formula
+  message(formula)
   #formula <- lowSpeedDensity_num ~ temp +  NDVI + prevalance + emergence
   GWPR.FEM.bandwidth <- # this is about fixed bandwidth
     bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
