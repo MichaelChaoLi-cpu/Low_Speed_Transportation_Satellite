@@ -34,7 +34,7 @@ if(not_get_result){
     bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
                            SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
                            upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
-                           kernel = "bisquare",doParallel = T, cluster.number = 70, gradientIncrecement = T,
+                           kernel = "bisquare",doParallel = T, cluster.number = 36, gradientIncrecement = T,
                            GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.02)
   GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
   save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.log.002.05.0005.Rdata")

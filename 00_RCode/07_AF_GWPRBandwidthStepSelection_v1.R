@@ -297,8 +297,7 @@ CV_F.step <- function(bw, data, ID_list, formula, p, longlat, adaptive, kernel,
     weight <- GWmodel::gw.weight(as.numeric(dMat), bw=bw, kernel=kernel, adaptive=adaptive)
     subsample$wgt <- as.vector(weight)
     subsample <- subsample[(subsample$wgt > 0.01),]
-    Psubsample <- plm::pdata.frame(subsample, index = index, drop.index = FALSE, row.names = FALSE,
-                                   stringsAsFactors = default.stringsAsFactors())
+    Psubsample <- plm::pdata.frame(subsample, index = index, drop.index = FALSE, row.names = FALSE)
     plm_subsample <- try(plm::plm(formula=formula, model = model, data = Psubsample,
                                   effect = effect, index = index, weights = wgt,
                                   random.method = random.method), silent = TRUE)
@@ -369,8 +368,7 @@ CV_F_para.step <- function(bw, data, ID_list, formula, p, longlat, adaptive, ker
       weight <- GWmodel::gw.weight(as.numeric(dMat), bw=bw, kernel=kernel, adaptive=adaptive)
       subsample$wgt <- as.vector(weight)
       subsample <- subsample[(subsample$wgt > 0.01),]
-      Psubsample <- plm::pdata.frame(subsample, index = index, drop.index = FALSE, row.names = FALSE,
-                                     stringsAsFactors = default.stringsAsFactors())
+      Psubsample <- plm::pdata.frame(subsample, index = index, drop.index = FALSE, row.names = FALSE)
       plm_subsample <- try(plm::plm(formula=formula, model=model, data=Psubsample,
                                     effect = effect, index=index, weights = wgt,
                                     random.method = random.method), silent = TRUE)
@@ -527,8 +525,7 @@ CV_A_para.step <- function(bw, data, ID_list, formula, p, longlat, adaptive, ker
       bw_to_total <- nrow(subsample)
       weight <- GWmodel::gw.weight(as.numeric(subsample$dist), bw=bw_to_total, kernel=kernel, adaptive=adaptive)
       subsample$wgt <- as.vector(weight)
-      Psubsample <- plm::pdata.frame(subsample, index = index, drop.index = FALSE, row.names = FALSE,
-                                     stringsAsFactors = default.stringsAsFactors())
+      Psubsample <- plm::pdata.frame(subsample, index = index, drop.index = FALSE, row.names = FALSE)
       plm_subsample <- plm::plm(formula=formula, model=model, data=Psubsample,
                                 effect = effect, index=index, weights = wgt,
                                 random.method = random.method)
