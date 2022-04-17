@@ -2,6 +2,8 @@
 
 
 # Note: this script is used for Supercomputer 
+# Tip: remember the package version should be consistent with R version on SuperCom.
+# Tip: package "doParallel" does not work on Linux.
 
 # end
 
@@ -12,8 +14,9 @@ library(plm)
 library(sp)
 library(doParallel)
 library(foreach)
+library(doSNOW)
 
-source("00_RCode/07_AF_GWPRBandwidthStepSelection_v1.R")
+source("00_RCode/SP_07_AF_GWPRBandwidthStepSelection_v1.R")
 points_mesh.in.Tokyo <- read.csv("04_Data/SP_00_points_mesh.in.Tokyo.RData")
 dataset_used.Tokyo <- read.csv("04_Data/SP_00_dataset_used.Tokyo.RData")
 proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
