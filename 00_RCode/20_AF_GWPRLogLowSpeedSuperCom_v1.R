@@ -39,3 +39,18 @@ dataset_used.Tokyo <- left_join(points_mesh.in.Tokyo %>% dplyr::select(GridID),
                                 dataset_used)
 write.csv(points_mesh.in.Tokyo, file = "04_Data/SP_00_points_mesh.in.Tokyo.RData")
 write.csv(dataset_used.Tokyo, file = "04_Data/SP_00_dataset_used.Tokyo.RData")
+
+dataset_used.test <- dataset_used.Tokyo
+dataset_used.test$GridID <- dataset_used.test$GridID %>% as.numeric()
+dataset_used.test <- dataset_used.test %>%
+  filter(GridID < 5239027000)
+dataset_used.test$GridID <- dataset_used.test$GridID %>% as.character()
+
+points_mesh.test <- points_mesh.in.Tokyo
+points_mesh.test$GridID <- points_mesh.test$GridID %>% as.numeric()
+points_mesh.test <- points_mesh.test %>%
+  filter(GridID < 5239027000)
+points_mesh.test$GridID <- points_mesh.test$GridID %>% as.character()
+
+write.csv(points_mesh.test, file = "04_Data/SP_00_points_mesh.test.RData")
+write.csv(dataset_used.test, file = "04_Data/SP_00_dataset_used.test.RData")

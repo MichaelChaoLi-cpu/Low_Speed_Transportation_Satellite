@@ -351,7 +351,7 @@ CV_F_para.step <- function(bw, data, ID_list, formula, p, longlat, adaptive, ker
   ###cl <- parallel::makeCluster(cluster.number)
   ###doParallel::registerDoParallel(cl)
   # ^^^ this does not work in linux
-  cl <- makeSOCKcluster(3)
+  cl <- makeSOCKcluster(cluster.number)
   registerDoSNOW(cl)
   
   
@@ -506,7 +506,7 @@ CV_A_para.step <- function(bw, data, ID_list, formula, p, longlat, adaptive, ker
   ###cl <- parallel::makeCluster(cluster.number)
   ###doParallel::registerDoParallel(cl)
   # ^^^ this does not work in linux
-  cl <- makeSOCKcluster(3)
+  cl <- makeSOCKcluster(cluster.number)
   registerDoSNOW(cl)
   
   
