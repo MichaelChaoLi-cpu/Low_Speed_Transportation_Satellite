@@ -35,7 +35,7 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
   
   # Data preparation
   varibale_name_in_equation <- all.vars(formula)
-  data <- dplyr::select(data, index, varibale_name_in_equation)
+  data <- dplyr::select(data, c(index, varibale_name_in_equation))
   data$raw_order_data <- 1:nrow(data)
   raw_id <- index[1]
   colnames(data)[1] <- "id"
@@ -105,6 +105,7 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
           bw.now <- GI.lower
           while (bw.now < GI.upper)
           {
+            start_time <- Sys.time()
             BandwidthVector <- append(BandwidthVector, bw.now)
             Score <- CV_A_para.step(bw = bw.now, data = lvl1_data, ID_list = ID_num,
                                     formula = formula, p = p, longlat = longlat, adaptive = adaptive,
@@ -112,6 +113,8 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
                                     random.method = random.method,  cluster.number = cluster.number)
             ScoreVector <- append(ScoreVector, Score)
             bw.now = bw.now + GI.step
+            end_time <- Sys.time()
+            cat("This step uses time", as.character(floor(end_time - start_time)), "s.\n")
           }
           BandwidthSocreTable <- cbind(BandwidthVector, ScoreVector)
           return(BandwidthSocreTable)
@@ -129,9 +132,11 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
         ScoreVector <- c()
         if(approach == "CV")
         {
+          start_time <- Sys.time()
           bw.now <- GI.lower
           while (bw.now < GI.upper)
           {
+            start_time <- Sys.time()
             BandwidthVector <- append(BandwidthVector, bw.now)
             Score <- CV_F_para.step(bw = bw.now, data = lvl1_data, ID_list = ID_num,
                                     formula = formula, p = p, longlat = longlat, adaptive = adaptive,
@@ -139,6 +144,8 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
                                     random.method = random.method,  cluster.number = cluster.number)
             ScoreVector <- append(ScoreVector, Score)
             bw.now = bw.now + GI.step
+            end_time <- Sys.time()
+            cat("This step uses time", as.character(floor(end_time - start_time)), "s.\n")
           }
           BandwidthSocreTable <- cbind(BandwidthVector, ScoreVector)
           return(BandwidthSocreTable)
@@ -211,6 +218,7 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
         bw.now <- GI.lower
         while (bw.now < GI.upper)
         {
+          start_time <- Sys.time()
           BandwidthVector <- append(BandwidthVector, bw.now)
           Score <- CV_F.step(bw = bw.now, data = lvl1_data, ID_list = ID_num,
                               formula = formula, p = p, longlat = longlat, adaptive = adaptive,
@@ -218,6 +226,8 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
                               random.method = random.method, huge_data_size = huge_data_size)
           ScoreVector <- append(ScoreVector, Score)
           bw.now = bw.now + GI.step
+          end_time <- Sys.time()
+          cat("This step uses time", as.character(floor(end_time - start_time)), "s.\n")
         }
         BandwidthSocreTable <- cbind(BandwidthVector, ScoreVector)
         return(BandwidthSocreTable)
@@ -353,6 +363,7 @@ CV_F_para.step <- function(bw, data, ID_list, formula, p, longlat, adaptive, ker
   # ^^^ this does not work in linux
   cl <- makeSOCKcluster(cluster.number)
   registerDoSNOW(cl)
+  cat('Now,', getDoParWorkers() %>% as.character(), 'cores are used!\n')
   
   
   #  v0.1.1 the loss function is based on local r2
@@ -508,6 +519,7 @@ CV_A_para.step <- function(bw, data, ID_list, formula, p, longlat, adaptive, ker
   # ^^^ this does not work in linux
   cl <- makeSOCKcluster(cluster.number)
   registerDoSNOW(cl)
+  cat('Now,', getDoParWorkers() %>% as.character(), 'cores are used!\n')
   
   
   #  v0.1.1 the loss function is based on local r2
