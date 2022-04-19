@@ -10,7 +10,8 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
                     effect = "individual", model = c("pooling", "within", "random"), random.method = "swar",
                     approach = c("CV","AIC"), kernel = "bisquare", longlat = FALSE, doParallel = FALSE,
                     cluster.number = 2, human.set.range = FALSE, h.upper = NULL, h.lower = NULL,
-                    gradientIncrecement = FALSE, GI.step = NULL, GI.upper = NULL, GI.lower = NULL)
+                    gradientIncrecement = FALSE, GI.step = NULL, GI.upper = NULL, GI.lower = NULL, 
+                                                     address.output  =  "")
 {
   if(length(index) != 2)
   {
@@ -144,8 +145,10 @@ bw.GWPR.step.selection <- function(formula, data, index, SDF, adaptive = FALSE, 
                                     random.method = random.method,  cluster.number = cluster.number)
             ScoreVector <- append(ScoreVector, Score)
             bw.now = bw.now + GI.step
+            
+            save(ScoreVector, file  =   address.output )
             end_time <- Sys.time()
-            cat("This step uses time", as.character(floor(end_time - start_time)), "s.\n")
+            cat("This step uses time", end_time - start_time, ".\n")
           }
           BandwidthSocreTable <- cbind(BandwidthVector, ScoreVector)
           return(BandwidthSocreTable)
