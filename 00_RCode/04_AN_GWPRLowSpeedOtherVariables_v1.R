@@ -114,6 +114,9 @@ rm(fem, ols, pdata, rem)
 #plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
 
 formula <- lowSpeedDensity ~ temp +  NDVI + prevalance + emergence
+formula <- lowSpeedDensity ~   temp +  NDVI + ter_pressure +  precipitation +  
+  UVAerosolIndex + PBLH + prevalance + emergence
+
 points_mesh.in.Tokyo <- points_mesh.in.GT@data
 points_mesh.in.Tokyo <- points_mesh.in.Tokyo %>%
   filter(PrefID == "13")
@@ -121,7 +124,7 @@ points_mesh.in.Tokyo <- points_mesh.in.Tokyo %>%
 dataset_used.Tokyo <- left_join(points_mesh.in.Tokyo %>% dplyr::select(GridID),
                                 dataset_used)
 
-cor(dataset_used.Tokyo %>% dplyr::select(all.vars(formula)))
+cor(dataset_used.Tokyo %>% dplyr::select(all.vars(formula)), use = "complete.obs")
 
 pdata <- pdata.frame(dataset_used.Tokyo , index = c("GridID", "time"))
 
@@ -148,8 +151,9 @@ GWPR.FEM.bandwidth <- # this is about fixed bandwidth
   bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
                          SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
                          upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
-                         kernel = "bisquare",doParallel = T, cluster.number = 15, gradientIncrecement = T,
-                         GI.step = 0.05, GI.upper = 1.5, GI.lower = 0.05)
+                         kernel = "bisquare",doParallel = T, cluster.number = 6, gradientIncrecement = T,
+                         GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.015)
+#test 0.005 step length, from 0.015 degree
 #GWPR.FEM.bandwidth.step.list <- rbind(GWPR.FEM.bandwidth.step.list, GWPR.FEM.bandwidth)
 GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
