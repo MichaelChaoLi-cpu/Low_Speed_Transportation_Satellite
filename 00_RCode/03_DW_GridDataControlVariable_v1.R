@@ -12,6 +12,8 @@ library(plm)
 library(COVID19)
 library(lubridate)
 library(stringr)
+library(doSNOW)
+library(foreach)
 
 extractPointDataFromRaster <- function(RasterFolder, filelist, cityLocationSpatialPoint,
                                        year_start_location, month_start_location, flip_reverse = T,
@@ -47,6 +49,44 @@ extractPointDataFromRaster <- function(RasterFolder, filelist, cityLocationSpati
   return(RasterDataset)
 }
 
+extractPointDataFromRasterPara <- function(RasterFolder, filelist, cityLocationSpatialPoint,
+                                       year_start_location, month_start_location, flip_reverse = T,
+                                       aimed_column_name = "raw", year_end_location = year_start_location + 3,
+                                       month_end_location = month_start_location + 1, core = 1
+){
+  RasterDataset <- 
+    data.frame(Doubles=double(),
+               Ints=integer(),
+               Factors=factor(),
+               Logicals=logical(),
+               Characters=character(),
+               stringsAsFactors=FALSE)
+  cl <- makeSOCKcluster(core)
+  registerDoSNOW(cl)
+  getDoParWorkers()
+  RasterDataset <- foreach (filename = filelist, .combine = base::rbind,
+                            .packages='tidyverse') %dopar% {
+    test_tiff <- raster::raster(paste0(RasterFolder, filename))
+    if(flip_reverse){
+      test_tiff <- flip(test_tiff, direction = 'y')
+    }
+    raster::crs(test_tiff) <- proj
+    Year <- stringr::str_sub(filename, year_start_location, year_end_location) %>% as.numeric()
+    Month <- stringr::str_sub(filename, month_start_location, month_end_location) %>% as.numeric()
+    
+    data_ext <- raster::extract(test_tiff, cityLocationSpatialPoint)
+    cityLocationSpatialPoint@data$raw <- data_ext
+    monthly_data <- cityLocationSpatialPoint@data %>%
+      dplyr::select(GridID, raw)
+    monthly_data <- monthly_data %>%
+      dplyr::mutate(year = Year,
+             month = Month)
+  }
+  stopCluster(cl)
+  colnames(RasterDataset) <- c("GridID", aimed_column_name, "year", "month")
+  return(RasterDataset)
+}
+
 setwd("D:\\11_Article\\01_Data\\01_mesh\\")
 mesh_grid <- readOGR(dsn = ".", layer = "MeshFile")
 mesh_grid@data <- mesh_grid@data %>%
@@ -64,6 +104,8 @@ points_mesh <- SpatialPointsDataFrame(coords = xy, data = points_mesh,
                                       proj4string = proj)
 rm(mesh_grid)
 rm(mesh_grid.ori)
+
+setwd("C:/Users/li.chao.987@s.kyushu-u.ac.jp/OneDrive - Kyushu University/11_Article/03_RStudio")
 
 #get ndvi MXD13Q1
 NDVIRasterFolder <- "D:/11_Article/01_Data/03_NDVI/VI_16Days_250m_v6/NDVI/"
@@ -145,58 +187,116 @@ NTLRasterDataset <-
                              11, 15, F, "NTL")
 save(NTLRasterDataset, file = "04_Data/05_NTLRasterDataset.RData")
 
-#get monthly terrain pressure from the OMNO2G, band 29 (terrain pressure)
-terrainPressureRasterFolder <- "D:/10_Article/09_TempOutput/03_MonthlyTerrainPressureTif/"
+#get monthly terrain pressure from the Noah 0.1 degree
+terrainPressureRasterFolder <- "D:/11_Article/01_Data/07_ClimaticData/temp/airPressure/"
 filelist <- list.files(terrainPressureRasterFolder)
 terrainPressureRasterDataset <- 
-  extractPointDataFromRaster(terrainPressureRasterFolder, filelist, points_mesh,
-                             21, 26, T, "ter_pressure")
-save(terrainPressureRasterDataset, file = "04_Data/07_terrainPressureRasterDatasett.RData")
+  extractPointDataFromRasterPara(terrainPressureRasterFolder, filelist, points_mesh,
+                             13, 17, F, "ter_pressure", core = 4)
+save(terrainPressureRasterDataset, file = "04_Data/07_terrainPressureRasterDatasett01.RData")
 
-#get monthly water vapor from the GLDAS_NOAH025_M 0.25 arc degree 
+### old
+#get monthly terrain pressure from the OMNO2G, band 29 (terrain pressure)
+#terrainPressureRasterFolder <- "D:/10_Article/09_TempOutput/03_MonthlyTerrainPressureTif/"
+#filelist <- list.files(terrainPressureRasterFolder)
+#terrainPressureRasterDataset <- 
+#  extractPointDataFromRaster(terrainPressureRasterFolder, filelist, points_mesh,
+#                             21, 26, T, "ter_pressure")
+#save(terrainPressureRasterDataset, file = "04_Data/07_terrainPressureRasterDatasett.RData")
+
+#get monthly water vapor from noah 0.1 arc degree 
 # Point based
-humidityRasterFolder <- "D:/10_Article/09_TempOutput/06_MonthlyVaporTif/Add025Outline/"
+humidityRasterFolder <- "D:/11_Article/01_Data/07_ClimaticData/temp/humidity/"
 filelist <- list.files(humidityRasterFolder)
 humidityRasterDataset <- 
-  extractPointDataFromRaster(humidityRasterFolder, filelist, points_mesh,
-                             21, 25, T, "humidity")
+  extractPointDataFromRasterPara(humidityRasterFolder, filelist, points_mesh,
+                             18, 22, F, "humidity", core = 6)
 
 humidityRasterDataset$humidity <- humidityRasterDataset$humidity * 1000 #convert the unit into g/kg
-humidityRasterDataset <- humidityRasterDataset %>% as.data.frame()
-humidityRasterDataset <- humidityRasterDataset %>%
-  filter(year > 2018) %>%
-  filter(year < 2021)
 
-save(humidityRasterDataset, file = "04_Data/08_humidityRasterDataset.RData")
+save(humidityRasterDataset, file = "04_Data/08_humidityRasterDataset01.RData")
 # 1 g/kg means 1 gram water in the 1 kg air.
 
-#get monthly precipitation from the GLDAS_NOAH025_M 0.25 arc degree
+### old
+#get monthly water vapor from the GLDAS_NOAH025_M 0.25 arc degree 
+# Point based
+#humidityRasterFolder <- "D:/10_Article/09_TempOutput/06_MonthlyVaporTif/Add025Outline/"
+#filelist <- list.files(humidityRasterFolder)
+#humidityRasterDataset <- 
+#  extractPointDataFromRaster(humidityRasterFolder, filelist, points_mesh,
+#                             21, 25, T, "humidity")
+#
+#humidityRasterDataset$humidity <- humidityRasterDataset$humidity * 1000 #convert the unit into g/kg
+#humidityRasterDataset <- humidityRasterDataset %>% as.data.frame()
+#humidityRasterDataset <- humidityRasterDataset %>%
+#  filter(year > 2018) %>%
+#  filter(year < 2021)
+#
+#save(humidityRasterDataset, file = "04_Data/08_humidityRasterDataset.RData")
+# 1 g/kg means 1 gram water in the 1 kg air.
+
+#get monthly precipitation from noah 0.1 arc degree
 # Point Based
-precipitationRasterFolder <- "D:/10_Article/09_TempOutput/07_MonthlyPrecipitationTif/Add025Outline/"
+precipitationRasterFolder <- "D:/11_Article/01_Data/07_ClimaticData/temp/precipitation/"
 filelist <- list.files(precipitationRasterFolder)
 precipitationRasterDataset <- 
-  extractPointDataFromRaster(precipitationRasterFolder, filelist, points_mesh,
-                             27, 31, T, "precipitation")
+  extractPointDataFromRasterPara(precipitationRasterFolder, filelist, points_mesh,
+                             24, 28, F, "precipitation", core = 6)
 precipitationRasterDataset$precipitation <- precipitationRasterDataset$precipitation * 3600 
 precipitationRasterDataset <- precipitationRasterDataset %>% as.data.frame()
-precipitationRasterDataset <- precipitationRasterDataset %>%
-  filter(year > 2018) %>%
-  filter(year < 2021)
-save(precipitationRasterDataset, file = "04_Data/09_precipitationRasterDataset.RData")
+save(precipitationRasterDataset, file = "04_Data/09_precipitationRasterDataset01.RData")
 # now, the precipitation unit is kg/(m2 * h)  
+
+#old
+#get monthly precipitation from the GLDAS_NOAH025_M 0.25 arc degree
+# Point Based
+#precipitationRasterFolder <- "D:/10_Article/09_TempOutput/07_MonthlyPrecipitationTif/Add025Outline/"
+#filelist <- list.files(precipitationRasterFolder)
+#precipitationRasterDataset <- 
+#  extractPointDataFromRaster(precipitationRasterFolder, filelist, points_mesh,
+#                             27, 31, T, "precipitation")
+#precipitationRasterDataset$precipitation <- precipitationRasterDataset$precipitation * 3600 
+#precipitationRasterDataset <- precipitationRasterDataset %>% as.data.frame()
+#precipitationRasterDataset <- precipitationRasterDataset %>%
+#  filter(year > 2018) %>%
+#  filter(year < 2021)
+#save(precipitationRasterDataset, file = "04_Data/09_precipitationRasterDataset.RData")
+# now, the precipitation unit is kg/(m2 * h)  
+
+#get monthly speed wind from the noah 0.1 arc degree
+# point based
+speedWindRasterFolder <- "D:/11_Article/01_Data/07_ClimaticData/temp/windSpeed/"
+filelist <- list.files(speedWindRasterFolder)
+speedWindRasterDataset <- 
+  extractPointDataFromRasterPara(speedWindRasterFolder, filelist, points_mesh,
+                             11, 15, F, "speedwind", core = 6)
+speedWindRasterDataset <- speedWindRasterDataset %>% as.data.frame()
+save(speedWindRasterDataset, file = "04_Data/10_speedWindRasterDataset01.RData")
+# now, the speed wind unit is m/s  
 
 #get monthly speed wind from the GLDAS_NOAH025_M 0.25 arc degree
 # point based
-speedWindRasterFolder <- "D:/10_Article/09_TempOutput/09_WindSpeed/Add025Outline/"
-filelist <- list.files(speedWindRasterFolder)
-speedWindRasterDataset <- 
-  extractPointDataFromRaster(speedWindRasterFolder, filelist, points_mesh,
-                             19, 23, T, "speedwind")
-speedWindRasterDataset <- speedWindRasterDataset %>% as.data.frame()
-speedWindRasterDataset <- speedWindRasterDataset %>%
-  filter(year > 2018) %>%
-  filter(year < 2021)
-save(speedWindRasterDataset, file = "04_Data/10_speedWindRasterDataset.RData")
+#speedWindRasterFolder <- "D:/10_Article/09_TempOutput/09_WindSpeed/Add025Outline/"
+#filelist <- list.files(speedWindRasterFolder)
+#speedWindRasterDataset <- 
+#  extractPointDataFromRaster(speedWindRasterFolder, filelist, points_mesh,
+#                             19, 23, T, "speedwind")
+#speedWindRasterDataset <- speedWindRasterDataset %>% as.data.frame()
+#speedWindRasterDataset <- speedWindRasterDataset %>%
+#  filter(year > 2018) %>%
+#  filter(year < 2021)
+#save(speedWindRasterDataset, file = "04_Data/10_speedWindRasterDataset.RData")
+# now, the speed wind unit is m/s  
+
+#get monthly short wave radiation from the noah 0.1 arc degree
+# point based
+shortWaveRasterFolder <- "D:/11_Article/01_Data/07_ClimaticData/temp/shortWave/"
+filelist <- list.files(shortWaveRasterFolder)
+shortWaveRasterDataset <- 
+  extractPointDataFromRasterPara(shortWaveRasterFolder, filelist, points_mesh,
+                                 11, 15, F, "shortWave", core = 6)
+shortWaveRasterDataset <- shortWaveRasterDataset %>% as.data.frame()
+save(shortWaveRasterDataset, file = "04_Data/16_shortWaveRasterDataset01.RData")
 # now, the speed wind unit is m/s  
 
 #get monthly troposphere no2 from the OMNO2G, band 9(troposphere no2)
