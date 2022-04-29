@@ -37,7 +37,7 @@ shortWaveRasterDataset$GridID <- shortWaveRasterDataset$GridID %>% as.numeric()
 dataset_used.Tokyo <- left_join(dataset_used.Tokyo, shortWaveRasterDataset, 
                                 by = c("GridID", "year", "month"))
 
-save(dataset_used.Tokyo, file = "17_dataset_used.Tokyo.Control.Variables.01resolution.version2.RData",
+save(dataset_used.Tokyo, file = "04_Data/17_dataset_used.Tokyo.Control.Variables.01resolution.version2.RData",
      version = 2)
 
 ### stage 1

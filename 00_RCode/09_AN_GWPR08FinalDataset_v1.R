@@ -12,7 +12,7 @@ library(doParallel)
 library(foreach)
 
 source("00_RCode/SP_07_AF_GWPRBandwidthStepSelection_v1.R")
-load("17_dataset_used.Tokyo.Control.Variables.01resolution.version2.RData")
+load("04_Data/17_dataset_used.Tokyo.Control.Variables.01resolution.version2.RData")
 points_mesh.in.Tokyo <- read.csv("04_Data/SP_00_points_mesh.in.Tokyo.RData")
 proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
 
