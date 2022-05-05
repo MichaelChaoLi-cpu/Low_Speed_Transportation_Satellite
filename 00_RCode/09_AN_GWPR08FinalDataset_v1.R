@@ -10,6 +10,7 @@ library(tmap)
 library(sp)
 library(doParallel)
 library(foreach)
+library(doSNOW)
 
 source("00_RCode/SP_07_AF_GWPRBandwidthStepSelection_v1.R")
 load("04_Data/17_dataset_used.Tokyo.Control.Variables.01resolution.version2.RData")
