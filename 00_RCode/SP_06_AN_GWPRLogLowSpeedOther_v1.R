@@ -15,8 +15,9 @@ library(sp)
 library(doParallel)
 library(foreach)
 library(doSNOW)
+library(parallel)
 
-source("00_RCode/SP_07_AF_GWPRBandwidthStepSelection_v1.R")
+source("00_RCode/SP_09_AF_GWPRBwStepSelectionMclapply_v1.R")
 #points_mesh.in.Tokyo <- read.csv("04_Data/SP_00_points_mesh.test.RData")
 #dataset_used.Tokyo <- read.csv("04_Data/SP_00_dataset_used.test.RData")
 points_mesh.in.Tokyo <- read.csv("04_Data/SP_00_points_mesh.in.Tokyo.RData")
@@ -44,9 +45,9 @@ if(not_get_result){
     bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
                            SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
                            upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
-                           kernel = "bisquare", doParallel = T, cluster.number = 36, gradientIncrecement = T,
+                           kernel = "bisquare", doParallel = T, cluster.number = 575, gradientIncrecement = T,
                            GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.015,  
-                           address.output  =  "03_Results/36_CV_F_8var_0015_05_0005.RData")
+                           address.output  =  "03_Results/575_mclapply_F_8var_0015_05_0006.RData")
   GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
   save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.log.var8.0015.05.0005.Rdata")
   not_get_result <- F
