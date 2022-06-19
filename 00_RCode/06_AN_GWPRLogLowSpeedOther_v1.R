@@ -217,3 +217,12 @@ if(not_get_result){
   save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.log.var8.0015.05.0005.Rdata")
   not_get_result <- F
 }
+
+GWPR.FEM.CV.F.result.8var.0.015 <- 
+  GWPR(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
+       SDF = points_mesh.in.Tokyo, adaptive = F, p = 2,
+       effect = "individual", kernel = "bisquare", longlat = F, 
+       model = "within", bw = 0.015)
+
+GWPR.FEM.CV.F.result.8var.0.015$SDF@data %>% View()
+summary(GWPR.FEM.CV.F.result.8var.0.015$SDF@data$temp_TVa %>% as.numeric())
