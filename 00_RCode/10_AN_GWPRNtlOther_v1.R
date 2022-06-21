@@ -46,8 +46,8 @@ if(not_get_result){
                            kernel = "bisquare", doParallel = T, cluster.number = 15, gradientIncrecement = T,
                            GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.015,  
                            address.output  =  "03_Results/15_laptop_F_8var_0015_05_0005.RData")
-  GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
-  save(GWPR.FEM.bandwidth.step.list, file = "03_Results/01_GWPR_BW_setp_list.Tokyo.log.var8.0015.05.0005.Rdata")
+   GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
+  save(GWPR.FEM.bandwidth.step.list, file = "03_Results/01_GWPR_BW_setp_list.Tokyo.ntl.var8.0015.05.0005.Rdata")
   not_get_result <- F
 }
 
