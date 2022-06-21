@@ -214,7 +214,7 @@ if(not_get_result){
                            GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.015,  
                            address.output  =  "03_Results/15_laptop_F_8var_0015_05_0005.RData")
   GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
-  save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.log.var8.0015.05.0005.Rdata")
+  save(GWPR.FEM.bandwidth.step.list, file = "03_Results/01_GWPR_BW_setp_list.Tokyo.log.var8.0015.05.0005.Rdata")
   not_get_result <- F
 }
 
@@ -226,3 +226,5 @@ GWPR.FEM.CV.F.result.8var.0.015 <-
 
 GWPR.FEM.CV.F.result.8var.0.015$SDF@data %>% View()
 summary(GWPR.FEM.CV.F.result.8var.0.015$SDF@data$temp_TVa %>% as.numeric())
+
+save(GWPR.FEM.CV.F.result.8var.0.015, file = "03_Results/02_GWPR.FEM.CV.F.result.8var.0.015.Rdata")
