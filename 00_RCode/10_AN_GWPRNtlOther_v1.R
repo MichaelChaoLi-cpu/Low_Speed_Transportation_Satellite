@@ -47,7 +47,15 @@ if(not_get_result){
                            GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.015,  
                            address.output  =  "03_Results/15_laptop_F_8var_0015_05_0005.RData")
    GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
-  save(GWPR.FEM.bandwidth.step.list, file = "03_Results/01_GWPR_BW_setp_list.Tokyo.ntl.var8.0015.05.0005.Rdata")
+  save(GWPR.FEM.bandwidth.step.list, file = "03_Results/03_GWPR_BW_setp_list.Tokyo.ntl.var9.0015.05.0005.Rdata")
+  plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
+  GWPR.FEM.bandwidth <- # this is about fixed bandwidth
+    bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
+                           SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
+                           upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
+                           kernel = "bisquare", doParallel = T, cluster.number = 15, gradientIncrecement = T,
+                           GI.step = 0.005, GI.upper = 1, GI.lower = 0.5,  
+                           address.output  =  "03_Results/15_laptop_F_8var_05_1_0005.RData")
   not_get_result <- F
 }
 
