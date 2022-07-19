@@ -46,7 +46,7 @@ if(not_get_result){
                            kernel = "bisquare", doParallel = T, cluster.number = 15, gradientIncrecement = T,
                            GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.015,  
                            address.output  =  "03_Results/15_laptop_F_8var_0015_05_0005.RData")
-   GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
+  GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
   save(GWPR.FEM.bandwidth.step.list, file = "03_Results/03_GWPR_BW_setp_list.Tokyo.ntl.var9.0015.05.0005.Rdata")
   plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
   GWPR.FEM.bandwidth <- # this is about fixed bandwidth
@@ -69,3 +69,16 @@ GWPR.FEM.CV.F.result.8var.0.015$SDF@data %>% View()
 summary(GWPR.FEM.CV.F.result.8var.0.015$SDF@data$temp_TVa %>% as.numeric())
 
 save(GWPR.FEM.CV.F.result.8var.0.015, file = "03_Results/02_GWPR.FEM.CV.F.result.8var.0.015.Rdata")
+
+#### use lowSpeedDensity
+formula_lowSpeedDensity <- lowSpeedDensity ~ NTL + temp +  NDVI + ter_pressure +  precipitation +  
+  UVAerosolIndex + PBLH + prevalance + emergence
+GWPR.FEM.bandwidth.lowSpeedDensity <- # this is about fixed bandwidth
+  bw.GWPR.step.selection(formula = formula_lowSpeedDensity, data = dataset_used.Tokyo, index = c("GridID", "time"),
+                         SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
+                         upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
+                         kernel = "bisquare", doParallel = T, cluster.number = 15, gradientIncrecement = T,
+                         GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.015,  
+                         address.output  =  "03_Results/15_laptop_F_8varformula_lowSpeedDensity_0015_05_0005.RData")
+GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
+save(GWPR.FEM.bandwidth.step.list, file = "03_Results/03_GWPR_BW_setp_list.Tokyo.ntl.var9.0015.05.0005.Rdata")
