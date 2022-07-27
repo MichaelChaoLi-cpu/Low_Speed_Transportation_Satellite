@@ -82,3 +82,10 @@ GWPR.FEM.bandwidth.lowSpeedDensity <- # this is about fixed bandwidth
                          address.output  =  "03_Results/15_laptop_F_8varformula_lowSpeedDensity_0015_05_0005.RData")
 GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 save(GWPR.FEM.bandwidth.step.list, file = "03_Results/03_GWPR_BW_setp_list.Tokyo.ntl.var9.0015.05.0005.Rdata")
+
+GWPR.FEM.CV.F.result.lowSpeedDensity.0.015 <- 
+  GWPR(formula = formula_lowSpeedDensity, data = dataset_used.Tokyo, index = c("GridID", "time"),
+       SDF = points_mesh.in.Tokyo, adaptive = F, p = 2,
+       effect = "individual", kernel = "bisquare", longlat = F, 
+       model = "within", bw = 0.015)
+save(GWPR.FEM.CV.F.result.lowSpeedDensity.0.015, file = "03_Results/04_GWPR.FEM.CV.F.result.lowSpeedDensity.0.015.Rdata")
