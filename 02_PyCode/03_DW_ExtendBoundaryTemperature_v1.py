@@ -14,7 +14,7 @@ from osgeo import gdal
 import glob
 
 ###  Day Temperature
-src_dataset = gdal.Open("D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Day_CMG/MOD11C3_LST_Day_CMG_2019_001.tif", 
+src_dataset = gdal.Open("D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/LST_Day_1km/MOD11A1_LST_Day_1km_2019_001.tif", 
                         gdal.GA_ReadOnly)
 geotransform = src_dataset.GetGeoTransform()
 spatialreference = src_dataset.GetProjection()
@@ -24,8 +24,8 @@ nrow = src_dataset.RasterYSize
 nband = 1
 src_dataset = None
 
-originalFileLocation = "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Day_CMG/"
-outputFileLocation = "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Day_CMG_Ext/"
+originalFileLocation = "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/LST_Day_1km/"
+outputFileLocation = "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/LST_Day_1km_Ext/"
 
 fileList = glob.glob(originalFileLocation + "/*.tif")
 
@@ -36,7 +36,7 @@ for file in fileList:
     rasterArray[rasterArray < 1] = np.nan
     
     addTimes = 0
-    while addTimes < 2:
+    while addTimes < 20:
         addRasterLayer = np.full((nrow, ncol), np.nan)
         for i  in np.linspace(1,nrow-2,nrow-2, dtype = int):
             for j  in np.linspace(1, ncol-2, ncol-2, dtype = int):
@@ -62,7 +62,7 @@ for file in fileList:
     dst_dataset = None
     
 ###  Night Temperature
-src_dataset = gdal.Open("D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Night_CMG/MOD11C3_LST_Night_CMG_2019_001.tif", 
+src_dataset = gdal.Open("D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/LST_Night_1km/MOD11A1_LST_Night_1km_2019_001.tif", 
                         gdal.GA_ReadOnly)
 geotransform = src_dataset.GetGeoTransform()
 spatialreference = src_dataset.GetProjection()
@@ -72,8 +72,8 @@ nrow = src_dataset.RasterYSize
 nband = 1
 src_dataset = None
 
-originalFileLocation = "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Night_CMG/"
-outputFileLocation = "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Monthly_005dg_v6/LST_Night_CMG_Ext/"
+originalFileLocation = "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/LST_Night_1km/"
+outputFileLocation = "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/LST_Night_1km_Ext/"
 
 fileList = glob.glob(originalFileLocation + "/*.tif")
 
@@ -84,7 +84,7 @@ for file in fileList:
     rasterArray[rasterArray < 1] = np.nan
     
     addTimes = 0
-    while addTimes < 2:
+    while addTimes < 20:
         addRasterLayer = np.full((nrow, ncol), np.nan)
         for i  in np.linspace(1,nrow-2,nrow-2, dtype = int):
             for j  in np.linspace(1, ncol-2, ncol-2, dtype = int):
