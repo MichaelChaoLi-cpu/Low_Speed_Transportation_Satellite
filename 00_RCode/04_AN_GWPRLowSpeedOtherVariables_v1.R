@@ -84,10 +84,12 @@ formula <- lowSpeedDensity ~
   # speedwind + ## highly related to ter_pressure
   #speedwind + humidity +
   # NTL + # stage two
-  temp +  NDVI + 
+  temp + NDVI + 
   ter_pressure +  precipitation +  
   mg_m2_troposphere_no2 + ozone + UVAerosolIndex + PBLH +
   prevalance + emergence
+
+formula <- NTL ~ lowSpeedDensity + NDVI
 
 cor(dataset_used %>% dplyr::select(all.vars(formula)))
 
@@ -99,6 +101,8 @@ fem <- plm(formula, pdata, model = "within")
 summary(fem)
 rem <- plm(formula, pdata, model = "random")
 summary(rem)
+fd <- plm(formula, pdata, model = "fd")
+summary(fd)
 
 pFtest(fem, ols)
 phtest(fem, rem)
