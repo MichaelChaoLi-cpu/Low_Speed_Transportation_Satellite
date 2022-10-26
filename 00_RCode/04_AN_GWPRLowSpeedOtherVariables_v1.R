@@ -12,8 +12,7 @@ library(doParallel)
 library(foreach)
 
 load("04_Data/02_panelLowSpeedDensityDataset.RData")
-load("04_Data/03_dayTempRasterDataset.ag.RData")
-load("04_Data/04_nightTimeTemperatureRasterDataset.ag.RData")
+load("04_Data/03_dayTempRasterDataset.RData")
 load("04_Data/05_NTLRasterDataset.RData")
 load("04_Data/06_NDVIRasterDataset.RData")
 load("04_Data/07_terrainPressureRasterDatasett.RData")
@@ -25,9 +24,7 @@ load("04_Data/12_TotalOzoneDURasterDataset.RData")
 load("04_Data/13_UVAerosolIndexRasterDataset.RData")
 load("04_Data/14_PBLHRasterDataset.RData")
 load("04_Data/15_covid19PrefectureData.RData")
-dataset_used <- left_join(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, nightTimeTemperatureRasterDataset.ag, 
+dataset_used <- left_join(panelLowSpeedDensityDataset, dayTempRasterDataset, 
                           by = c("GridID", "year", "month"))
 dataset_used <- left_join(dataset_used, NTLRasterDataset, 
                           by = c("GridID", "year", "month"))
@@ -56,7 +53,7 @@ dataset_used <- dataset_used %>%
          mortality = ifelse(is.na(mortality), 0, mortality),
          emergence = ifelse(is.na(emergence), 0, emergence))
 
-rm(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, nightTimeTemperatureRasterDataset.ag,
+rm(panelLowSpeedDensityDataset, dayTempRasterDataset, 
    NTLRasterDataset, terrainPressureRasterDataset, NDVIRasterDataset, 
    humidityRasterDataset, precipitationRasterDataset, speedWindRasterDataset, 
    troposphereNo2RasterDataset, ozoneRasterDataset, UVAerosolIndexRasterDataset, 
@@ -64,7 +61,6 @@ rm(panelLowSpeedDensityDataset, dayTempRasterDataset.ag, nightTimeTemperatureRas
 rm(covid19PrefectureData)
 
 dataset_used$time <- dataset_used$year * 100 + dataset_used$month
-dataset_used$temp <- (dataset_used$dayTimeTemperature + dataset_used$nightTimeTemperature ) / 2
 
 save(dataset_used, file = "04_Data/00_datasetUsed.RData")
 

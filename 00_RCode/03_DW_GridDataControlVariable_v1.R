@@ -105,7 +105,7 @@ points_mesh <- SpatialPointsDataFrame(coords = xy, data = points_mesh,
 rm(mesh_grid)
 rm(mesh_grid.ori)
 
-setwd("C:/Users/li.chao.987@s.kyushu-u.ac.jp/OneDrive - Kyushu University/11_Article/03_RStudio")
+setwd("D:/OneDrive - Kyushu University/11_Article/03_RStudio")
 
 #get ndvi MXD13Q1
 NDVIRasterFolder <- "D:/11_Article/01_Data/03_NDVI/VI_16Days_250m_v6/NDVI/"
@@ -157,26 +157,16 @@ if(run) {
 }
 
 #get temperature 
-load("04_Data/00_points_mesh.in.Tokyo.RData")
-dayTempRasterFolder <- "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/MergedMODIS/"
+#load("04_Data/00_points_mesh.in.Tokyo.RData")
+dayTempRasterFolder <- "D:/11_Article/01_Data/06_Tempature/Surf_Temp_Daily_1Km_v6/ExtendMODISMonth/"
 filelist <- list.files(dayTempRasterFolder)
 dayTempRasterDataset <- 
-  extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh.in.Tokyo,
-                             6, month_start_location = 11, F,
-                             "Temperature", month_end_location = 13)
-dayTempRasterDataset.ag <- dayTempRasterDataset
-dayTempRasterDataset.ag$date <- 
-  as.Date((dayTempRasterDataset.ag$month - 1),
-          origin = paste0(dayTempRasterDataset.ag$year,"-01-01")) %>% as.character()
-dayTempRasterDataset.ag$month <- str_sub(dayTempRasterDataset.ag$date, 6, 7) %>% as.numeric()
-dayTempRasterDataset.ag <- dayTempRasterDataset.ag %>% dplyr::select(-date)
-dayTempRasterDataset.ag <- aggregate(dayTempRasterDataset.ag$Temperature,
-                                     by = list(dayTempRasterDataset.ag$GridID, dayTempRasterDataset.ag$year,
-                                               dayTempRasterDataset.ag$month), FUN = mean, na.rm = T) 
-colnames(dayTempRasterDataset.ag) <- c("GridID", "year", "month", "Temperature")
-dayTempRasterDataset.ag$Temperature <- dayTempRasterDataset.ag$Temperature *
+  extractPointDataFromRaster(dayTempRasterFolder, filelist, points_mesh,
+                             1, month_start_location = 6, F,
+                             "Temperature")
+dayTempRasterDataset$Temperature <- dayTempRasterDataset$Temperature *
   0.02 - 273.16
-save(dayTempRasterDataset.ag, file = "04_Data/03_dayTempRasterDataset.ag.RData")
+save(dayTempRasterDataset, file = "04_Data/03_dayTempRasterDataset.RData")
 
 
 #Nighttime Light
