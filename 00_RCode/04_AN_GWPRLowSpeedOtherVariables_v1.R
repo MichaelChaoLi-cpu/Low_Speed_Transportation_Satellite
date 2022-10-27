@@ -11,58 +11,64 @@ library(sp)
 library(doParallel)
 library(foreach)
 
-load("04_Data/02_panelLowSpeedDensityDataset.RData")
-load("04_Data/03_dayTempRasterDataset.RData")
-load("04_Data/05_NTLRasterDataset.RData")
-load("04_Data/06_NDVIRasterDataset.RData")
-load("04_Data/07_terrainPressureRasterDatasett.RData")
-load("04_Data/08_humidityRasterDataset.RData")
-load("04_Data/09_precipitationRasterDataset.RData")
-load("04_Data/10_speedWindRasterDataset.RData")
-load("04_Data/11_troposphereNo2RasterDataset.RData")
-load("04_Data/12_TotalOzoneDURasterDataset.RData")
-load("04_Data/13_UVAerosolIndexRasterDataset.RData")
-load("04_Data/14_PBLHRasterDataset.RData")
-load("04_Data/15_covid19PrefectureData.RData")
-dataset_used <- left_join(panelLowSpeedDensityDataset, dayTempRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, NTLRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, terrainPressureRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, NDVIRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, humidityRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, precipitationRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, speedWindRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, troposphereNo2RasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, ozoneRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, UVAerosolIndexRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, PBLHRasterDataset, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- left_join(dataset_used, covid19PrefectureData, 
-                          by = c("GridID", "year", "month"))
-dataset_used <- dataset_used %>%
-  mutate(prevalance = ifelse(is.na(prevalance), 0, prevalance),
-         mortality = ifelse(is.na(mortality), 0, mortality),
-         emergence = ifelse(is.na(emergence), 0, emergence))
-
-rm(panelLowSpeedDensityDataset, dayTempRasterDataset, 
-   NTLRasterDataset, terrainPressureRasterDataset, NDVIRasterDataset, 
-   humidityRasterDataset, precipitationRasterDataset, speedWindRasterDataset, 
-   troposphereNo2RasterDataset, ozoneRasterDataset, UVAerosolIndexRasterDataset, 
-   PBLHRasterDataset)
-rm(covid19PrefectureData)
-
-dataset_used$time <- dataset_used$year * 100 + dataset_used$month
-
-save(dataset_used, file = "04_Data/00_datasetUsed.RData")
+makeDatasetUsed <- function(run = FALSE){
+  if(run){
+    load("04_Data/02_panelLowSpeedDensityDataset.RData")
+    load("04_Data/03_dayTempRasterDataset.RData")
+    load("04_Data/05_NTLRasterDataset.RData")
+    load("04_Data/06_NDVIRasterDataset.RData")
+    load("04_Data/07_terrainPressureRasterDatasett.RData")
+    load("04_Data/08_humidityRasterDataset.RData")
+    load("04_Data/09_precipitationRasterDataset.RData")
+    load("04_Data/10_speedWindRasterDataset.RData")
+    load("04_Data/11_troposphereNo2RasterDataset.RData")
+    load("04_Data/12_TotalOzoneDURasterDataset.RData")
+    load("04_Data/13_UVAerosolIndexRasterDataset.RData")
+    load("04_Data/14_PBLHRasterDataset.RData")
+    load("04_Data/15_covid19PrefectureData.RData")
+    dataset_used <- left_join(panelLowSpeedDensityDataset, dayTempRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, NTLRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, terrainPressureRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, NDVIRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, humidityRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, precipitationRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, speedWindRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, troposphereNo2RasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, ozoneRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, UVAerosolIndexRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, PBLHRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, covid19PrefectureData, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- dataset_used %>%
+      mutate(prevalance = ifelse(is.na(prevalance), 0, prevalance),
+             mortality = ifelse(is.na(mortality), 0, mortality),
+             emergence = ifelse(is.na(emergence), 0, emergence))
+    
+    rm(panelLowSpeedDensityDataset, dayTempRasterDataset, 
+       NTLRasterDataset, terrainPressureRasterDataset, NDVIRasterDataset, 
+       humidityRasterDataset, precipitationRasterDataset, speedWindRasterDataset, 
+       troposphereNo2RasterDataset, ozoneRasterDataset, UVAerosolIndexRasterDataset, 
+       PBLHRasterDataset)
+    rm(covid19PrefectureData)
+    
+    dataset_used$time <- dataset_used$year * 100 + dataset_used$month
+    
+    save(dataset_used, file = "04_Data/00_datasetUsed.RData")
+  } else {
+    print("We do not remake the data")
+  }
+}
 
 load("04_Data/00_datasetUsed.RData")
 load("04_Data/00_points_mesh.in.GT.RData")
@@ -75,17 +81,7 @@ dataset_used <- left_join(dataset_used, data.in.GT)
 dataset_used <- dataset_used %>% filter(!is.na(PrefID))
 rm(data.in.GT)
 
-formula <- lowSpeedDensity ~ 
-  # nightTimeTemperature + humidity + ##these variables are highly related to day time temperature
-  # speedwind + ## highly related to ter_pressure
-  #speedwind + humidity +
-  # NTL + # stage two
-  Temperature + NDVI + 
-  ter_pressure +  precipitation +  
-  mg_m2_troposphere_no2 + ozone + UVAerosolIndex + PBLH +
-  prevalance + emergence
-
-formula <- NTL ~ lowSpeedDensity + NDVI + Temperature 
+formula <- NTL ~ lowSpeedDensity + NDVI + Temperature + prevalance + emergence
 
 cor(dataset_used %>% dplyr::select(all.vars(formula)))
 
@@ -116,9 +112,7 @@ rm(fem, ols, pdata, rem)
 #GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 #plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
 
-formula <- lowSpeedDensity ~ temp +  NDVI + prevalance + emergence
-formula <- lowSpeedDensity ~   temp +  NDVI + ter_pressure +  precipitation +  
-  UVAerosolIndex + PBLH + prevalance + emergence
+formula <- NTL ~ lowSpeedDensity + NDVI + Temperature + prevalance + emergence
 
 points_mesh.in.Tokyo <- points_mesh.in.GT@data
 points_mesh.in.Tokyo <- points_mesh.in.Tokyo %>%
@@ -154,7 +148,7 @@ GWPR.FEM.bandwidth <- # this is about fixed bandwidth
   bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
                          SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
                          upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
-                         kernel = "bisquare",doParallel = T, cluster.number = 6, gradientIncrecement = T,
+                         kernel = "bisquare",doParallel = T, cluster.number = 8, gradientIncrecement = T,
                          GI.step = 0.005, GI.upper = 0.5, GI.lower = 0.015)
 #test 0.005 step length, from 0.015 degree
 #GWPR.FEM.bandwidth.step.list <- rbind(GWPR.FEM.bandwidth.step.list, GWPR.FEM.bandwidth)
