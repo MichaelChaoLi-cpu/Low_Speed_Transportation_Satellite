@@ -80,12 +80,12 @@ formula <- lowSpeedDensity ~
   # speedwind + ## highly related to ter_pressure
   #speedwind + humidity +
   # NTL + # stage two
-  temp + NDVI + 
+  Temperature + NDVI + 
   ter_pressure +  precipitation +  
   mg_m2_troposphere_no2 + ozone + UVAerosolIndex + PBLH +
   prevalance + emergence
 
-formula <- NTL ~ lowSpeedDensity + NDVI
+formula <- NTL ~ lowSpeedDensity + NDVI + Temperature 
 
 cor(dataset_used %>% dplyr::select(all.vars(formula)))
 

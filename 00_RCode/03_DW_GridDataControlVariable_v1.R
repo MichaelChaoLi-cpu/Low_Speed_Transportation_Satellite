@@ -108,24 +108,11 @@ rm(mesh_grid.ori)
 setwd("D:/OneDrive - Kyushu University/11_Article/03_RStudio")
 
 #get ndvi MXD13Q1
-NDVIRasterFolder <- "D:/11_Article/01_Data/03_NDVI/VI_16Days_250m_v6/NDVI/"
+NDVIRasterFolder <- "D:/11_Article/01_Data/03_NDVI/VI_16Days_250m_v6/ExtendNDVI/"
 filelist <- list.files(NDVIRasterFolder)
 NDVIRasterDataset <- 
   extractPointDataFromRaster(NDVIRasterFolder, filelist, points_mesh,
-                             14, 19, F, "NDVI", 17, 21)
-colnames(NDVIRasterDataset) <- c("GridID", "NDVI", "year", "month")
-NDVIRasterDataset$date <- 
-  as.Date((NDVIRasterDataset$month - 1),
-          origin = paste0(NDVIRasterDataset$year,"-01-01")) %>% as.character()
-NDVIRasterDataset$month <- str_sub(NDVIRasterDataset$date, 6, 7) %>% as.numeric()
-NDVIRasterDataset <- NDVIRasterDataset %>% dplyr::select(-date)
-NDVIRasterDataset <- aggregate(NDVIRasterDataset$NDVI,
-                               by = list(NDVIRasterDataset$GridID, 
-                                         NDVIRasterDataset$year, 
-                                         NDVIRasterDataset$month), 
-                               FUN = "mean", na.rm = T
-)
-colnames(NDVIRasterDataset) <- c("GridID", "year", "month", "NDVI")
+                             1, 6, F, "NDVI")
 NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI / 10000  #convert into from 1 to -1 
 NDVIRasterDataset$NDVI <- NDVIRasterDataset$NDVI * 100 #convert into from 100% to -100% 
 save(NDVIRasterDataset, file = "04_Data/06_NDVIRasterDataset.RData")
@@ -133,11 +120,11 @@ save(NDVIRasterDataset, file = "04_Data/06_NDVIRasterDataset.RData")
 run <- F
 if(run) {
   #get ndvi
-  NDVIRasterFolder <- "D:\\11_Article\\01_Data\\03_NDVI\\VI_Monthly_005dg_v6\\NDVI_Ext\\"
+  NDVIRasterFolder <- "D:\\11_Article\\01_Data\\03_NDVI\\VI_16Days_250m_v6\\ExtendNDVI\\"
   filelist <- list.files(NDVIRasterFolder)
   NDVIRasterDataset <- 
     extractPointDataFromRaster(NDVIRasterFolder, filelist, points_mesh,
-                               14, 19, F, "NDVI", 17, 21)
+                               14, 19, F, "NDVI")
   colnames(NDVIRasterDataset) <- c("GridID", "NDVI", "year", "month")
   NDVIRasterDataset$date <- 
     as.Date((NDVIRasterDataset$month - 1),
