@@ -112,7 +112,7 @@ rm(fem, ols, pdata, rem)
 #GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 #plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
 
-formula <- NTL ~ lowSpeedDensity + NDVI + Temperature + prevalance + emergence
+formula <- lowSpeedDensity ~ NTL + NDVI + Temperature + prevalance + emergence
 
 points_mesh.in.Tokyo <- points_mesh.in.GT@data
 points_mesh.in.Tokyo <- points_mesh.in.Tokyo %>%
@@ -156,7 +156,7 @@ GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
 save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.145.005.005.Rdata")
 
-GWPR.FEM.bandwidth = 1.15 ###
+GWPR.FEM.bandwidth = 0.035 ###
 ################################ this is GWPR based on FEM
 points_mesh.in.Tokyo@data <- points_mesh.in.Tokyo@data %>% rename("id"="GridID")
 points_mesh.in.Tokyo@data <- points_mesh.in.Tokyo@data %>% dplyr::select(id)
@@ -166,5 +166,5 @@ GWPR.FEM.CV.F.result <- GWPR(formula = formula, data = dataset_used.Tokyo%>%rena
                              model = "within")
 
 GWPR.FEM.CV.F.result$SDF@data %>% View()
-summary(GWPR.FEM.CV.F.result$SDF@data$temp_TVa %>% as.numeric())
-save(GWPR.FEM.CV.F.result, file = "03_Results/GWPR_FEM_CV_F_result_1.15.Rdata")
+summary(GWPR.FEM.CV.F.result$SDF@data$lowSpeedDensity_TVa %>% as.numeric())
+save(GWPR.FEM.CV.F.result, file = "03_Results/GWPR_FEM_CV_F_result_NTL_0035.Rdata")
