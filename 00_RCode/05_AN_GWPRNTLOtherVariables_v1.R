@@ -23,7 +23,7 @@ dataset_used <- left_join(dataset_used, data.in.GT)
 dataset_used <- dataset_used %>% filter(!is.na(PrefID))
 rm(data.in.GT)
 
-formula <- NTL ~ lowSpeedDensity + temp +  NDVI + prevalance + emergence
+formula <- lowSpeedDensity ~ NTL + Temperature +  NDVI + prevalance + emergence
 points_mesh.in.Tokyo <- points_mesh.in.GT@data
 points_mesh.in.Tokyo <- points_mesh.in.Tokyo %>%
   filter(PrefID == "13")

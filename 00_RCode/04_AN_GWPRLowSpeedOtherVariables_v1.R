@@ -145,10 +145,10 @@ points_mesh.in.Tokyo <- SpatialPointsDataFrame(coords = xy, data = points_mesh.i
 # we exiamine from the GWPR based on fem 
 formula
 GWPR.FEM.bandwidth <- # this is about fixed bandwidth
-  bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo%>%rename("id"="GridID"), index = c("id", "time"),
+  bw.GWPR.step.selection(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
                          SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
                          upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
-                         kernel = "bisquare",doParallel = T, cluster.number = 8, gradientIncrecement = T,
+                         kernel = "bisquare",doParallel = T, cluster.number = 12, gradientIncrecement = T,
                          GI.step = 0.005, GI.upper = 0.2, GI.lower = 0.015)
 #test 0.005 step length, from 0.015 degree
 #GWPR.FEM.bandwidth.step.list <- rbind(GWPR.FEM.bandwidth.step.list, GWPR.FEM.bandwidth)
