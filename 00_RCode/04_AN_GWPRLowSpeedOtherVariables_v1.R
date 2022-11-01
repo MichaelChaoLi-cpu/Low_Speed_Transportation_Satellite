@@ -154,7 +154,7 @@ GWPR.FEM.bandwidth <- # this is about fixed bandwidth
 #GWPR.FEM.bandwidth.step.list <- rbind(GWPR.FEM.bandwidth.step.list, GWPR.FEM.bandwidth)
 GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
-save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.145.005.005.Rdata")
+save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.0200.0015.0005.Rdata")
 
 GWPR.FEM.bandwidth = 0.035 ###
 ################################ this is GWPR based on FEM
