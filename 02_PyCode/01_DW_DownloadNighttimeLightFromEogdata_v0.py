@@ -19,30 +19,30 @@ import pandas as pd
 import tarfile
 import glob
 
-driver = webdriver.Chrome(ChromeDriverManager(version="97.0.4692.71").install())
+driver = webdriver.Chrome(ChromeDriverManager(version="107.0.5304.62").install())
 
 month = ['01', '02', '03', '04', '05', '06',
          '07', '08', '09', '10', '11', '12']
 year = 2019
 i = 0
 while i < 12:
-    locationService = 'https://eogdata.mines.edu/nighttime_light/monthly/v10/' + str(year) + '/' + str(year) + month[i] + '/vcmcfg/'
+    locationService = 'https://eogdata.mines.edu/nighttime_light/monthly/v10/' + str(year) + '/' + str(year) + month[i] + '/vcmslcfg/'
     print(locationService)
 
     driver.get(locationService)
     driver.find_element_by_xpath(r'//*[@id="indexlist"]/tbody/tr[5]/td[2]/a').click()
-    time.sleep(30)
+    time.sleep(120)
     i = i + 1
     
 year = 2020
 i = 0
 while i < 12:
-    locationService = 'https://eogdata.mines.edu/nighttime_light/monthly/v10/' + str(year) + '/' + str(year) + month[i] + '/vcmcfg/'
+    locationService = 'https://eogdata.mines.edu/nighttime_light/monthly/v10/' + str(year) + '/' + str(year) + month[i] + '/vcmslcfg/'
     print(locationService)
 
     driver.get(locationService)
     driver.find_element_by_xpath(r'//*[@id="indexlist"]/tbody/tr[5]/td[2]/a').click()
-    time.sleep(30)
+    time.sleep(120)
     i = i + 1
 
 def extract(tar_url, extract_path='.'):
@@ -56,5 +56,5 @@ def extract(tar_url, extract_path='.'):
 tgzFileList = glob.glob("D:/11_Article/01_Data/05_NTL/NTL_Raster/*.tgz")
 
 for tar_location in tgzFileList:
-    extract_path = "D:/11_Article/01_Data/05_NTL/NTL_Raster/temp"
+    extract_path = "D:/11_Article/01_Data/05_NTL/NTL_Raster/temp2"
     extract(tar_location, extract_path)    
