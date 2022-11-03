@@ -474,3 +474,63 @@ covid19PrefectureData <- covid19PrefectureData %>%
   mutate(emergence = ifelse(month == 4, 0.8333, emergence),
          emergence = ifelse(month == 5, 0.6774, emergence))
 save(covid19PrefectureData, file = "04_Data/15_covid19PrefectureData.RData")
+
+
+makeDatasetUsed <- function(run = FALSE){
+  if(run){
+    load("04_Data/02_panelLowSpeedDensityDataset.RData")
+    load("04_Data/03_dayTempRasterDataset.RData")
+    load("04_Data/05_NTLRasterDataset.RData")
+    load("04_Data/06_NDVIRasterDataset.RData")
+    load("04_Data/07_terrainPressureRasterDatasett.RData")
+    load("04_Data/08_humidityRasterDataset.RData")
+    load("04_Data/09_precipitationRasterDataset.RData")
+    load("04_Data/10_speedWindRasterDataset.RData")
+    load("04_Data/11_troposphereNo2RasterDataset.RData")
+    load("04_Data/12_TotalOzoneDURasterDataset.RData")
+    load("04_Data/13_UVAerosolIndexRasterDataset.RData")
+    load("04_Data/14_PBLHRasterDataset.RData")
+    load("04_Data/15_covid19PrefectureData.RData")
+    dataset_used <- left_join(panelLowSpeedDensityDataset, dayTempRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, NTLRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, terrainPressureRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, NDVIRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, humidityRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, precipitationRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, speedWindRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, troposphereNo2RasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, ozoneRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, UVAerosolIndexRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, PBLHRasterDataset, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- left_join(dataset_used, covid19PrefectureData, 
+                              by = c("GridID", "year", "month"))
+    dataset_used <- dataset_used %>%
+      mutate(prevalance = ifelse(is.na(prevalance), 0, prevalance),
+             mortality = ifelse(is.na(mortality), 0, mortality),
+             emergence = ifelse(is.na(emergence), 0, emergence))
+    
+    rm(panelLowSpeedDensityDataset, dayTempRasterDataset, 
+       NTLRasterDataset, terrainPressureRasterDataset, NDVIRasterDataset, 
+       humidityRasterDataset, precipitationRasterDataset, speedWindRasterDataset, 
+       troposphereNo2RasterDataset, ozoneRasterDataset, UVAerosolIndexRasterDataset, 
+       PBLHRasterDataset)
+    rm(covid19PrefectureData)
+    
+    dataset_used$time <- dataset_used$year * 100 + dataset_used$month
+    
+    save(dataset_used, file = "04_Data/00_datasetUsed.RData")
+  } else {
+    print("We do not remake the data")
+  }
+}
