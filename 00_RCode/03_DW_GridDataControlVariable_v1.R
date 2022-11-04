@@ -157,7 +157,7 @@ save(dayTempRasterDataset, file = "04_Data/03_dayTempRasterDataset.RData")
 
 
 #Nighttime Light
-NTLRasterFolder <- "D:/11_Article/01_Data/05_NTL/NTL_Raster/temp/"
+NTLRasterFolder <- "D:/11_Article/01_Data/05_NTL/NTL_Raster/temp2/"
 filelist <- list.files(NTLRasterFolder)
 NTLRasterDataset <- 
   extractPointDataFromRaster(NTLRasterFolder, filelist, points_mesh,

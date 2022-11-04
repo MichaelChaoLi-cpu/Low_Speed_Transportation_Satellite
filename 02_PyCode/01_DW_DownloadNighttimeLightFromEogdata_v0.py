@@ -18,6 +18,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import tarfile
 import glob
+import os
 
 driver = webdriver.Chrome(ChromeDriverManager(version="107.0.5304.62").install())
 
@@ -31,7 +32,7 @@ while i < 12:
 
     driver.get(locationService)
     driver.find_element_by_xpath(r'//*[@id="indexlist"]/tbody/tr[5]/td[2]/a').click()
-    time.sleep(120)
+    time.sleep(90)
     i = i + 1
     
 year = 2020
@@ -42,7 +43,7 @@ while i < 12:
 
     driver.get(locationService)
     driver.find_element_by_xpath(r'//*[@id="indexlist"]/tbody/tr[5]/td[2]/a').click()
-    time.sleep(120)
+    time.sleep(90)
     i = i + 1
 
 def extract(tar_url, extract_path='.'):
@@ -53,8 +54,11 @@ def extract(tar_url, extract_path='.'):
         tar.close()
         break
     
-tgzFileList = glob.glob("D:/11_Article/01_Data/05_NTL/NTL_Raster/*.tgz")
+tgzFileList = glob.glob("D:/11_Article/01_Data/05_NTL/NTL_Raster/temp2/*.tgz")
 
 for tar_location in tgzFileList:
     extract_path = "D:/11_Article/01_Data/05_NTL/NTL_Raster/temp2"
     extract(tar_location, extract_path)    
+    
+for tar_location in tgzFileList:
+    os.remove(tar_location)
