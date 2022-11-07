@@ -96,20 +96,19 @@ GWPR.FEM.bandwidth <- # this is about fixed bandwidth
 #GWPR.FEM.bandwidth.step.list <- rbind(GWPR.FEM.bandwidth.step.list, GWPR.FEM.bandwidth)
 GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
 plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
-save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.0200.0015.0005.Rdata")
+save(GWPR.FEM.bandwidth.step.list, file = "03_Results/GWPR_BW_setp_list.Tokyo.0200.00025.00025.Rdata")
 
-GWPR.FEM.bandwidth = 0.035 ###
+GWPR.FEM.bandwidth = 0.015 ###
 ################################ this is GWPR based on FEM
-points_mesh.in.Tokyo@data <- points_mesh.in.Tokyo@data %>% rename("id"="GridID")
-points_mesh.in.Tokyo@data <- points_mesh.in.Tokyo@data %>% dplyr::select(id)
-GWPR.FEM.CV.F.result <- GWPR(formula = formula, data = dataset_used.Tokyo%>%rename("id"="GridID"), index = c("id", "time"),
+points_mesh.in.Tokyo@data <- points_mesh.in.Tokyo@data %>% dplyr::select(GridID)
+GWPR.FEM.CV.F.result <- GWPR(formula = formula, data = dataset_used.Tokyo, index = c("GridID", "time"),
                              SDF = points_mesh.in.Tokyo, bw = GWPR.FEM.bandwidth, adaptive = F,
                              p = 2, effect = "individual", kernel = "bisquare", longlat = F, 
                              model = "within")
 
 GWPR.FEM.CV.F.result$SDF@data %>% View()
-summary(GWPR.FEM.CV.F.result$SDF@data$lowSpeedDensity_TVa %>% as.numeric())
-save(GWPR.FEM.CV.F.result, file = "03_Results/GWPR_FEM_CV_F_result_lowSpeedDensity_0035.Rdata")
+summary(GWPR.FEM.CV.F.result$SDF@data$NTL_TVa %>% as.numeric())
+save(GWPR.FEM.CV.F.result, file = "03_Results/GWPR_FEM_CV_F_result_lowSpeedDensity_0015.Rdata")
 
 load("03_Results/GWPR_BW_setp_list.Tokyo.0200.0015.0005.Rdata")
 load("03_Results/GWPR_FEM_CV_F_result_lowSpeedDensity_0035.Rdata")
