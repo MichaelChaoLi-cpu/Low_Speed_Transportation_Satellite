@@ -23,16 +23,6 @@ dataset_used <- left_join(dataset_used, data.in.GT)
 dataset_used <- dataset_used %>% filter(!is.na(PrefID))
 rm(data.in.GT)
 
-# we exiamine from the GWPR based on fem 
-#GWPR.FEM.bandwidth <- # this is about fixed bandwidth
-#  bw.GWPR.step.selection(formula = formula, data = dataset_used, index = c("GridID", "time"),
-#                         SDF = points_mesh.in.GT, adaptive = F, p = 2, bigdata = F,
-#                         upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
-#                         kernel = "bisquare",doParallel = T, cluster.number = 6, gradientIncrecement = T,
-#                         GI.step = 0.01, GI.upper = 0.125, GI.lower = 0.005)
-#GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
-#plot(GWPR.FEM.bandwidth.step.list[,1], GWPR.FEM.bandwidth.step.list[,2])
-
 formula <- lowSpeedDensity ~ NTL + NDVI + Temperature + prevalance + emergence
 
 points_mesh.in.Tokyo <- points_mesh.in.GT@data
