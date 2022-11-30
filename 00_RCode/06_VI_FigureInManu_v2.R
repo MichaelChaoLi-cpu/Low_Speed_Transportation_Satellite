@@ -11,6 +11,7 @@ library("viridisLite")
 library("viridis") 
 library(sp)
 library(moments)
+library(ggpubr)
 
 get_density <- function(x, y, ...) {
   dens <- MASS::kde2d(x, y, ...)
@@ -234,11 +235,75 @@ grid.arrange(a, b, c,
 dev.off()
 #-------------descriptive statistics--------------
 
+#-------------trends of XY------------------------
+dataset_used.Tokyo$lowSpeedDensity <- dataset_used.Tokyo$lowSpeedDensity / 1000 / 1000 
+(plot1 <- ggscatter(dataset_used.Tokyo, x = "NTL", y = "lowSpeedDensity", size = 1,
+                    add = "reg.line", conf.int = TRUE,
+                    cor.coef = F, cor.method = "pearson",
+                    xlab = "NTL", ylab = "Low-Speed Transportation Column\n(Million Capita/grid month)",           
+                    add.params = list(color = "blue", fill = "lightskyblue1"),
+                    color = "grey76", shape = 21, xlim = c(0, 600), ylim = c(0, 6)
+                    ) +
+  stat_cor( p.accuracy = 0.01, r.accuracy = 0.01, label.x.npc = "left", label.y.npc = 0.96) +
+  annotate("text", x = 0, y = 6, label = 'bold("a")', parse = TRUE, size = 5)
+)
+
+
+(plot2 <- ggscatter(dataset_used.Tokyo, x = "NDVI", y = "lowSpeedDensity", size = 1,
+                    add = "reg.line", conf.int = TRUE,
+                    cor.coef = F, cor.method = "pearson",
+                    xlab = "NDVI (%)", ylab = "Low-Speed Transportation Column\n(Million Capita/grid month)",
+                    add.params = list(color = "blue", fill = "lightskyblue1"),
+                    color = "grey76", shape = 21, ylim = c(0, 6)
+                    ) +
+    stat_cor( p.accuracy = 0.01, r.accuracy = 0.01, label.x.npc = "left", label.y.npc = 0.96) +
+    annotate("text", x = 0, y = 6, label = 'bold("b")', parse = TRUE, size = 5)
+)
+
+(plot3 <- ggscatter(dataset_used.Tokyo, x = "Temperature", y = "lowSpeedDensity", size = 1,
+                    add = "reg.line", conf.int = TRUE,
+                    cor.coef = F, cor.method = "pearson",
+                    xlab = "Temperature (Celsius Degree)", ylab = "Low-Speed Transportation Column\n(Million Capita/grid month)",
+                    add.params = list(color = "blue", fill = "lightskyblue1"),
+                    color = "grey76", shape = 21, ylim = c(0, 6)
+                    ) +
+    stat_cor( p.accuracy = 0.01, r.accuracy = 0.01, label.x.npc = "left", label.y.npc = 0.96)+
+    annotate("text", x = 0, y = 6, label = 'bold("c")', parse = TRUE, size = 5)
+)
+
+(plot4 <- ggscatter(dataset_used.Tokyo, x = "prevalance", y = "lowSpeedDensity", size = 1,
+                    add = "reg.line", conf.int = TRUE,
+                    cor.coef = F, cor.method = "pearson",
+                    xlab = "COVID-19 Prevalence (Case/1000 Capita)", ylab = "Low-Speed Transportation Column\n(Million Capita/grid month)",
+                    add.params = list(color = "blue", fill = "lightskyblue1"),
+                    color = "grey76", shape = 21, ylim = c(0, 6)
+                    ) +
+    stat_cor( p.accuracy = 0.01, r.accuracy = 0.01, label.x.npc = "left", label.y.npc = 0.96) +
+    annotate("text", x = 0, y = 6, label = 'bold("d")', parse = TRUE, size = 5)
+)
+
+(plot5 <- ggscatter(dataset_used.Tokyo, x = "emergence", y = "lowSpeedDensity", size = 1,
+                    add = "reg.line", conf.int = TRUE,
+                    cor.coef = F, cor.method = "pearson",
+                    xlab = "Lockdown Ratio", ylab = "Low-Speed Transportation Column\n(Million Capita/grid month)",
+                    add.params = list(color = "blue", fill = "lightskyblue1"),
+                    color = "grey76", shape = 21, ylim = c(0, 6)
+                    ) +
+    stat_cor( p.accuracy = 0.01, r.accuracy = 0.01, label.x.npc = "left", label.y.npc = 0.96) +
+    annotate("text", x = 0, y = 6, label = 'bold("e")', parse = TRUE, size = 5)
+)
+
+
+jpeg(file="06_Figure/cor_line1.jpeg", width = 297, height = 210, units = "mm", quality = 300, res = 300)
+grid.arrange(plot1, plot2, plot3, 
+             plot4, plot5, 
+             nrow = 2)
+dev.off()
+#-------------trends of XY------------------------
 
 
 
-
-
+dataset_used.Tokyo$lowSpeedDensity <- dataset_used.Tokyo$lowSpeedDensity * 1000 * 1000 
 formula <- lowSpeedDensity ~ NTL + NDVI + Temperature + prevalance + emergence
 usedDataset.tranformed <- dataset_used.Tokyo %>% dplyr::select(GridID, all.vars(formula))
 usedDataset.tranformed.mean <- usedDataset.tranformed %>%
@@ -411,3 +476,4 @@ skewness(usedDataset.tranformed$NDVI_t)
 skewness(usedDataset.tranformed$Temperature_t)
 skewness(usedDataset.tranformed$prevalance_t)
 skewness(usedDataset.tranformed$emergence_t)
+
