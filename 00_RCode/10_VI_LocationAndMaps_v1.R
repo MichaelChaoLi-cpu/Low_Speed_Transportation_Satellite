@@ -13,7 +13,7 @@ library(ggmap)
 library(cowplot)
 library(ggrepel)
 
-register_google(key = "AIzaSyBXXDC-DDcwVqljeuCE4KmVPXp0XLKNoCU")
+register_google(key = "XXXX")
 
 setwd("./04_Data/shp/")
 shape_Japan_pref <- readOGR(dsn = ".", layer = "jpn_admbnda_adm1_2019")
@@ -103,4 +103,54 @@ setwd("../../")
 
 jpeg(file="06_Figure/locationWithMulti.jpeg", width = 297, height = 210, units = "mm", quality = 300, res = 300)
 locationWithMulti
+dev.off()
+
+### coefficient
+pal <- colorRampPalette(c("blue","green","yellow","red"))
+pal(20)
+
+load("03_Results/GWPR_FEM_CV_F_result_lowSpeedDensity_0015.Rdata")
+SDF.coef <- GWPR.FEM.CV.F.result$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef$NTL <- SDF.coef$NTL %>% as.numeric() 
+(plot.NTL.01 <- ggplot() +
+    geom_sf(data = SDF.coef, aes(color = NTL), alpha = 0.8, size = 0.5) +
+    scico::scale_color_scico(palette = "vik", limits = c(-8000, 8000)) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    xlim(138.8, 140) +
+    ylim(35.3, 36.1) + 
+    annotation_scale(location = "bl", width_hint = 0.4) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+                           pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                           style = north_arrow_fancy_orienteering) +
+    theme_bw() +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank()
+    )
+  )
+  
+(plot.NTL.02 <- ggplot() +
+    geom_sf(data = SDF.coef, aes(color = NTL), alpha = 0.8, size = 2, show.legend = F) +
+    scico::scale_color_scico(palette = "vik", limits = c(-8000, 8000)) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    xlim(139.34, 139.45) +
+    ylim(34.65, 34.8) + 
+    annotation_scale(location = "bl", width_hint = 0.4) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+                           pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                           style = north_arrow_fancy_orienteering) +
+    theme_bw() + 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank()
+    )
+)
+
+plot.NTL <- ggdraw() +
+  draw_plot(plot.NTL.01, x = 0, y = 0, width = 0.65, height = 1) +
+  draw_plot(plot.NTL.02, x = 0.65, y = 0, width = 0.3, height = 1) +
+  draw_plot_label(label = c("A", "B"), size = 15,
+                  x = c(0, 0.65), y = c(0.8, 0.8))
+jpeg(file="06_Figure/NTL.Coeff.jpeg", width = 297, height = 210, units = "mm", quality = 300, res = 300)
+plot.NTL
 dev.off()
