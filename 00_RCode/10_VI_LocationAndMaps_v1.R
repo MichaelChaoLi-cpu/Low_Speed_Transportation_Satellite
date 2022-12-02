@@ -12,6 +12,7 @@ library(ggspatial) # scale bars and north arrows
 library(ggmap)
 library(cowplot)
 library(ggrepel)
+library(plotrix)
 
 register_google(key = "XXXX")
 
@@ -116,12 +117,16 @@ SDF.coef <- st_as_sf(SDF.coef)
 
 ### NTL
 SDF.coef$NTL <- SDF.coef$NTL %>% as.numeric() 
+summary(SDF.coef$NTL)
+mean(SDF.coef$NTL)
+mean(SDF.coef$NTL) - 1.96 * std.error(SDF.coef$NTL)
+mean(SDF.coef$NTL) + 1.96 * std.error(SDF.coef$NTL)
 SDF.coef <- SDF.coef %>% 
   mutate(NTL = ifelse(NTL>3000, 3000, NTL))
 (plot.NTL.01 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = NTL), alpha = 0.8, size = 0.5) +
     scico::scale_color_scico(palette = "vik", limits = c(-3000, 3000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(138.8, 140) +
     ylim(35.3, 36.1) + 
@@ -138,7 +143,7 @@ SDF.coef <- SDF.coef %>%
 (plot.NTL.02 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = NTL), alpha = 0.8, size = 2, show.legend = F) +
     scico::scale_color_scico(palette = "vik", limits = c(-3000, 3000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(139.34, 139.45) +
     ylim(34.65, 34.8) + 
@@ -172,7 +177,7 @@ SDF.coef <- SDF.coef %>%
 (plot.NDVI.01 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = NDVI), alpha = 0.8, size = 0.5) +
     scico::scale_color_scico(palette = "vik", limits = c(-30000, 30000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(138.8, 140) +
     ylim(35.3, 36.1) + 
@@ -189,7 +194,7 @@ SDF.coef <- SDF.coef %>%
 (plot.NDVI.02 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = NDVI), alpha = 0.8, size = 2, show.legend = F) +
     scico::scale_color_scico(palette = "vik", limits = c(-30000, 30000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(139.34, 139.45) +
     ylim(34.65, 34.8) + 
@@ -223,7 +228,7 @@ SDF.coef <- SDF.coef %>%
 (plot.Temperature.01 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = Temperature), alpha = 0.8, size = 0.5) +
     scico::scale_color_scico(palette = "vik", limits = c(-10000, 10000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(138.8, 140) +
     ylim(35.3, 36.1) + 
@@ -240,7 +245,7 @@ SDF.coef <- SDF.coef %>%
 (plot.Temperature.02 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = Temperature), alpha = 0.8, size = 2, show.legend = F) +
     scico::scale_color_scico(palette = "vik", limits = c(-10000, 10000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(139.34, 139.45) +
     ylim(34.65, 34.8) + 
@@ -274,7 +279,7 @@ SDF.coef <- SDF.coef %>%
 (plot.prevalance.01 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = prevalance), alpha = 0.8, size = 0.5) +
     scico::scale_color_scico("Prevalance", palette = "vik", limits = c(-1000000, 1000000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(138.8, 140) +
     ylim(35.3, 36.1) + 
@@ -291,7 +296,7 @@ SDF.coef <- SDF.coef %>%
 (plot.prevalance.02 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = prevalance), alpha = 0.8, size = 2, show.legend = F) +
     scico::scale_color_scico(palette = "vik", limits = c(-1000000, 1000000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(139.34, 139.45) +
     ylim(34.65, 34.8) + 
@@ -325,7 +330,7 @@ SDF.coef <- SDF.coef %>%
 (plot.emergence.01 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = emergence), alpha = 0.8, size = 0.5) +
     scico::scale_color_scico("Lockdown Ratio", palette = "vik", limits = c(-300000, 300000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(138.8, 140) +
     ylim(35.3, 36.1) + 
@@ -342,7 +347,7 @@ SDF.coef <- SDF.coef %>%
 (plot.emergence.02 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = emergence), alpha = 0.8, size = 2, show.legend = F) +
     scico::scale_color_scico(palette = "vik", limits = c(-300000, 300000)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
     geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(139.34, 139.45) +
     ylim(34.65, 34.8) + 
@@ -380,8 +385,8 @@ SDF.coef <- SDF.coef %>%
 (plot.x.01 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = x), alpha = 0.8, size = 0.5) +
     scale_color_gradientn("Mean", colors = pal(20)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
-    geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
+    geom_sf(data = tokyo_boudary, color = "black", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(138.8, 140) +
     ylim(35.3, 36.1) + 
     annotation_scale(location = "bl", width_hint = 0.4) +
@@ -397,8 +402,8 @@ SDF.coef <- SDF.coef %>%
 (plot.x.02 <- ggplot() +
     geom_sf(data = SDF.coef, aes(color = x), alpha = 0.8, size = 2, show.legend = F) +
     scale_color_gradientn("Mean", colors = pal(20)) +
-    geom_sf(data = shape_Japan_city, color = "grey10", fill = 'white', alpha = 0.4, size = 0.5) +
-    geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
+    geom_sf(data = tokyo_boudary, color = "black", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
     xlim(139.34, 139.45) +
     ylim(34.65, 34.8) + 
     annotation_scale(location = "bl", width_hint = 0.4) +

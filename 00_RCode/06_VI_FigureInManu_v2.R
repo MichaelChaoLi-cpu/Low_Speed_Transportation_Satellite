@@ -477,3 +477,30 @@ skewness(usedDataset.tranformed$Temperature_t)
 skewness(usedDataset.tranformed$prevalance_t)
 skewness(usedDataset.tranformed$emergence_t)
 
+GWPR.FEM.bandwidth.temp <-
+  c(169335520, 246166362, 54478341, 106825361, 170485959, 52470546, 98328164, 119094439, # 0.02
+    68031382, 96273843, 70460731, 76411967, 82523261, 68907767, 79838406, 83369647, # 0.04
+    78814983, 83069440, 94671040, 92346531, 93639655, 97400574, 96500364, 105328915, # 0.06
+    103172993, 108376984, 108376984, 116806274, 122287170, 128032493, 128669532, 135547573, # 0.08
+    133396281, 138741250, 147216220, 143733511, 146815411, 152955409, 151361974, 157777848, # 0.10
+    154885725, 161805554, 163301140, 164404284, 168440166, 173955825, 175735641, 179891492, # 0.12
+    184164716, 189121961, 192260140, 195698420, 199618679, 205245167, 207852793, 210596774, # 0.14
+    215415933, 216794229, 220253753, 223309878, 225327396, 228726201, 228819643, 231412879, # 0.16
+    235055216, 235682452, 237982507, 240489300, 241485007, 243588578, 242300083, 24238402, # 0.18
+    241220978, 238628371, 238322413, 235883249, 233084975, 230788726, 231062511 # 0.1975
+  )
+step <- seq(0.0025, 0.1975, 0.0025)
+bw.df <- cbind(GWPR.FEM.bandwidth.temp, step) %>% as.data.frame()
+
+## 
+bw.plot <- ggplot(bw.df, aes(x = step, y = GWPR.FEM.bandwidth.temp)) +
+  geom_point() + 
+  annotate("segment", xend = 0.016, x = 0.05, yend = 52470546, y = 50000000,
+           colour = "red", size = 1.5, arrow = arrow()) +
+  annotate("text", x = 0.06, y = 48000000, label = "Optimal Bandwidth: 0.015") +
+  scale_x_continuous(name = "Fixed Distance Bandwidth (Arc Degree)") +
+  scale_y_continuous(name = "Mean Square Prediction Error") +
+  theme_bw()
+jpeg(file="06_Figure/bwselection.jpeg", width = 297, height = 210, units = "mm", quality = 300, res = 300)
+bw.plot
+dev.off()

@@ -60,7 +60,7 @@ GWPR.FEM.bandwidth <- # this is about fixed bandwidth
                          SDF = points_mesh.in.Tokyo, adaptive = F, p = 2, bigdata = F,
                          upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
                          kernel = "bisquare",doParallel = T, cluster.number = 10, gradientIncrecement = T,
-                         GI.step = 0.0025, GI.upper = 0.2, GI.lower = 0.175)
+                         GI.step = 0.0025, GI.upper = 0.2, GI.lower = 0.0025)
 #test 0.005 step length, from 0.015 degree
 #GWPR.FEM.bandwidth.step.list <- rbind(GWPR.FEM.bandwidth.step.list, GWPR.FEM.bandwidth)
 GWPR.FEM.bandwidth.step.list <- GWPR.FEM.bandwidth
