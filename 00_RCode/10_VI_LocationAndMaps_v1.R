@@ -117,7 +117,8 @@ SDF.coef <- st_as_sf(SDF.coef)
 
 ### NTL
 SDF.coef$NTL <- SDF.coef$NTL %>% as.numeric() 
-summary(SDF.coef$NTL)
+min(SDF.coef$NTL)
+max(SDF.coef$NTL)
 mean(SDF.coef$NTL)
 mean(SDF.coef$NTL) - 1.96 * std.error(SDF.coef$NTL)
 mean(SDF.coef$NTL) + 1.96 * std.error(SDF.coef$NTL)
@@ -170,6 +171,11 @@ dev.off()
 ### NDVI
 SDF.coef$NDVI <- SDF.coef$NDVI %>% as.numeric() 
 SDF.coef$NDVI %>% hist()
+min(SDF.coef$NDVI)
+max(SDF.coef$NDVI)
+mean(SDF.coef$NDVI)
+mean(SDF.coef$NDVI) - 1.96 * std.error(SDF.coef$NDVI)
+mean(SDF.coef$NDVI) + 1.96 * std.error(SDF.coef$NDVI)
 SDF.coef <- SDF.coef %>% 
   mutate(NDVI = ifelse(NDVI < -30000, -30000, NDVI),
          NDVI = ifelse(NDVI > 30000, 30000, NDVI)
@@ -221,6 +227,11 @@ dev.off()
 ### Temperature
 SDF.coef$Temperature <- SDF.coef$Temperature %>% as.numeric() 
 SDF.coef$Temperature %>% hist()
+min(SDF.coef$Temperature)
+max(SDF.coef$Temperature)
+mean(SDF.coef$Temperature)
+mean(SDF.coef$Temperature) - 1.96 * std.error(SDF.coef$Temperature)
+mean(SDF.coef$Temperature) + 1.96 * std.error(SDF.coef$Temperature)
 SDF.coef <- SDF.coef %>% 
   mutate(Temperature = ifelse(Temperature < -10000, -10000, Temperature),
          Temperature = ifelse(Temperature > 10000, 10000, Temperature)
@@ -272,6 +283,11 @@ dev.off()
 ### prevalance
 SDF.coef$prevalance <- SDF.coef$prevalance %>% as.numeric() 
 SDF.coef$prevalance %>% hist()
+min(SDF.coef$prevalance)
+max(SDF.coef$prevalance)
+mean(SDF.coef$prevalance)
+mean(SDF.coef$prevalance) - 1.96 * std.error(SDF.coef$prevalance)
+mean(SDF.coef$prevalance) + 1.96 * std.error(SDF.coef$prevalance)
 SDF.coef <- SDF.coef %>% 
   mutate(prevalance = ifelse(prevalance < -1000000, -1000000, prevalance),
          prevalance = ifelse(prevalance > 1000000, 1000000, prevalance)
@@ -323,6 +339,11 @@ dev.off()
 ### emergence
 SDF.coef$emergence <- SDF.coef$emergence %>% as.numeric() 
 SDF.coef$emergence %>% hist()
+min(SDF.coef$emergence)
+max(SDF.coef$emergence)
+mean(SDF.coef$emergence)
+mean(SDF.coef$emergence) - 1.96 * std.error(SDF.coef$emergence)
+mean(SDF.coef$emergence) + 1.96 * std.error(SDF.coef$emergence)
 SDF.coef <- SDF.coef %>% 
   mutate(emergence = ifelse(emergence < -300000, -300000, emergence),
          emergence = ifelse(emergence > 300000, 300000, emergence)
