@@ -21,18 +21,30 @@ Chao Li, Shunsuke Managi
      
 ### Spatial Distribution of the COVID-19 Lockdown Ratio Coefficients in GWPR    
 ![](06_Figure/emergence.Coeff.jpeg)   
-
-## R Code
-
-## Data  
-OD_data: use the cell phone locations to detect the movements, monthly  
-NDVI: MOD13, monthly  
-Weather: M*D07, daily  
-NTL: VNP46A2 500m, monthly  
-WorldPop: 1km, yearly  
-  
-## Code  
-[01_DW_GridRealMovementEstimation_v1.R](00_RCode/01_DW_GridRealMovementEstimation_v1.R): This script is to wash the data to get low speed transportation density from 2019.01 to 2021.01, a total of 25 months of the Great Tokyo Area. 
-
-## Current Platform
-Right
+    
+## R Code  
+[01_DW_GridRealMovementEstimation_v1.R](00_RCode/01_DW_GridRealMovementEstimation_v1.R): This script is to wash the data to get low speed transportation density from 2019.01 to 2020.12, a total of 24 months of Tokyo (28600 grids 24 months).    
+[02_DW_GridDataConstructionLowSpeed_v1.R](00_RCode/02_DW_GridDataConstructionLowSpeed_v1.R): This script is to make the the low-speed transportation dataset.   
+[03_DW_GridDataControlVariable_v1.R](00_RCode/03_DW_GridDataControlVariable_v1.R): This script is to build the dataset including the varibales of interest, including low-speed transportation, NTL, NDVI, temperature, prevalence, lockdown ratio. The accuracy of the model is 97.50%.     
+[04_AN_GWPRLowSpeedOtherVariables_v1.R](00_RCode/04_AN_GWPRLowSpeedOtherVariables_v1.R): This is to run GWPR model with 0.015 degree. The accuracy of the model is 97.50%.     
+[05_AN_ResultValidation_v1.R](00_RCode/05_AN_ResultValidation_v1.R): This is to temporal validation of results.    
+[06_VI_FigureInManu_v2.R](00_RCode/06_VI_FigureInManu_v2.R): this is to visual figures except maps.    
+[07_AF_GWPRBandwidthStepSelection_v1.R](00_RCode/07_AF_GWPRBandwidthStepSelection_v1.R): This script revises the function in GWPR.light to perform step bandwidth selection.   
+[08_AF_GWPRRevisedForCrossValidation_v1.R](00_RCode/08_AF_GWPRRevisedForCrossValidation_v1.R): This script is the CV funciton.     
+[09_AN_10FoldCrossValidation_v1.R](00_RCode/09_AN_10FoldCrossValidation_v1.R): This script is to run 10-fold CV.     
+[10_VI_LocationAndMaps_v1.R](00_RCode/10_VI_LocationAndMaps_v1.R): This script is to visualize the maps.     
+      
+## Workflow
+**WF.A: (01, 02) -> 03 -> 04 -> 05 -> 09 -> (06, 10) -> END**     
+**WF.A.0102.03**: This step is to make the dataset to use in the analysis.      
+**WF.A.03.04**: This step conducts the analysis using GWPR based on FEM with **Fixed** distance bandwidth.    
+**WF.A.04.05**: This step conducts temporal validation of results.    
+**WF.A.05.09**: This step is to run 10-fold CV.    
+**WF.A.09.0610**: This step is to visualize.    
+     
+## Contact Us:    
+- Email: Prof. Shunsuke Managi <managi@doc.kyushu-u.ac.jp>     
+- Email: Chao Li <chaoli0394@gmail.com>    
+      
+## Term of Use:
+Authors/funders retain copyright (where applicable) of code on this Github repo. This GitHub repo and its contents herein, including data, link to data source, and analysis code that are intended solely for reproducing the results in the manuscript "Spatially Varied Connections between Human Activity and Satellite Observations in Tokyo". The analyses rely upon publicly available data from multiple sources, that are often updated without advance notice. We hereby disclaim any and all representations and warranties with respect to the site, including accuracy, fitness for use, and merchantability. By using this site, its content, information, and software you agree to assume all risks associated with your use or transfer of information and/or software. You agree to hold the authors harmless from any claims relating to the use of this site.  
