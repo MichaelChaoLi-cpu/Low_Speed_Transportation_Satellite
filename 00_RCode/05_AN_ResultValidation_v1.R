@@ -1,5 +1,12 @@
 # Author: M.L.
 
+# input: GWPR_FEM_CV_F_result_lowSpeedDensity_0015.Rdata
+# GWPR_FEM_CV_F_result_lowSpeedDensity_0015.Rdata: "bw" 0.015
+#                                                  "accuracy" 97.50%
+
+# output: judgement.score.csv
+# judgement.score.csv: "Time", "N", "R2", "RMSE", "MAE", "r", "Slope", "Intercept"
+
 # end
 
 library(tidyverse)

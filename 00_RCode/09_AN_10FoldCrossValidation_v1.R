@@ -1,5 +1,24 @@
 # Author: M.L.
 
+# input: 00_datasetUsed.RData
+# 00_datasetUsed.RData: "GridID" Grid ID of the mesh grid.
+# 00_datasetUsed.RData: "year"
+# 00_datasetUsed.RData: "month"
+# 00_datasetUsed.RData: "lowSpeedDensity" low-speed transportation how many people*time
+#                       movement are recorded
+# 00_datasetUsed.RData: "NTL" nighttime light instensity, unit nW⁄(cm^2*sr)
+# 00_datasetUsed.RData: "NDVI": greenness (%)
+# 00_datasetUsed.RData: "Temperature" monthly average temperature
+# 00_datasetUsed.RData: "prevalence" COVID-19 prevalence (infections/1000 capita)  
+# 00_datasetUsed.RData: "emergence" COVID-19 lockdown ratio 
+
+# output: femCrossValidation.csv
+# femCrossValidation.csv: "foldNumber", "CVtrain.R2", "train.inter", 
+#                         "train.slope", "N.train", "corre.train",
+#                         "rmse.train", "mae.train", "CVtest.R2",
+#                         "test.inter", "test.slope", "N.test",
+#                         "corre.test", "rmse.test", "mae.test"
+
 # end
 
 library(tidyverse)

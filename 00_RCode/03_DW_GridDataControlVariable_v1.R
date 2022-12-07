@@ -1,5 +1,35 @@
 # Author: M.L.
 
+# output: 05_NTLRasterDataset.RData
+# 05_NTLRasterDataset.RData: "GridID" Grid ID of the mesh grid.
+# 05_NTLRasterDataset.RData: "NTL" nighttime light instensity, unit nW⁄(cm^2*sr)
+# 05_NTLRasterDataset.RData: "year"
+# 05_NTLRasterDataset.RData: "month"
+
+# output: 06_NDVIRasterDataset.RData
+# 06_NDVIRasterDataset.RData: "GridID" Grid ID of the mesh grid.
+# 06_NDVIRasterDataset.RData: "NDVI": NDVI
+# 06_NDVIRasterDataset.RData: "year"
+# 06_NDVIRasterDataset.RData: "month"
+
+# output: 03_dayTempRasterDataset.RData
+# 03_dayTempRasterDataset.RData: "GridID" Grid ID of the mesh grid.
+# 03_dayTempRasterDataset.RData: "Temperature"
+# 03_dayTempRasterDataset.RData: "year"
+# 03_dayTempRasterDataset.RData: "month"
+
+# output: 00_datasetUsed.RData
+# 00_datasetUsed.RData: "GridID" Grid ID of the mesh grid.
+# 00_datasetUsed.RData: "year"
+# 00_datasetUsed.RData: "month"
+# 00_datasetUsed.RData: "lowSpeedDensity" low-speed transportation how many people*time
+#                       movement are recorded
+# 00_datasetUsed.RData: "NTL" nighttime light instensity, unit nW⁄(cm^2*sr)
+# 00_datasetUsed.RData: "NDVI": greenness (%)
+# 00_datasetUsed.RData: "Temperature" monthly average temperature
+# 00_datasetUsed.RData: "prevalence" COVID-19 prevalence (infections/1000 capita)  
+# 00_datasetUsed.RData: "emergence" COVID-19 lockdown ratio 
+
 # end
 
 library(tidyverse)
