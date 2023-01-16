@@ -4,7 +4,7 @@ This is the repo for the DP11. There should be a relationship between low-speed 
 Human activity significantly affects urban economics, vitality, and development. Owing to the availability of comprehensive and high-resolution satellite observations, a variety of information of interest is obtained or estimated effectively and efficiently. Satellite observations are generally proxied to represent and probe human activity. However, substantial evidence to support the connections between human activity and satellite data is relatively rare. Here, we use geographically weighted panel regression (GWPR) to examine the relationship between low-speed transportation and several satellite data, including nighttime light (NTL), greenness, temperature, as well as COVID-19-related variables from January 2019 to December 2020. The accuracy of our model is 97.50%, and the model is reliable according to the 10-fold cross-validation. Our result shows that a 1-unit increase in NTL in highly developed areas is associated with more human activity growth. The only increased greenness in the publicly accessible parks could attract more people, while warmer weather consistently increases low-speed transportation. Overall, this research provides solid evidence to connect human activity and satellite data to academia, governments, and societies.    
      
 ## Author    
-Chao Li, Shunsuke Managi    
+Chao Li, Alexander Ryota Keeley, Shunsuke Managi    
      
 ## Result:    
 ### Spatial Distribution of the NTL Coefficients in GWPR (a: the part of Tokyo on Honshu Island; b: Oshima Machi)    
@@ -43,7 +43,8 @@ Chao Li, Shunsuke Managi
 **WF.A.09.0610**: This step is to visualize.    
      
 ## Contact Us:    
-- Email: Prof. Shunsuke Managi <managi@doc.kyushu-u.ac.jp>     
+- Email: Prof. Shunsuke Managi <managi@doc.kyushu-u.ac.jp>  
+- Email: Assistant Prof. Alexander Ryota Keeley <keeley.ryota.alexander.416@m.kyushu-u.ac.jp>
 - Email: Chao Li <chaoli0394@gmail.com>    
       
 ## Term of Use:
