@@ -18,6 +18,18 @@ from sklearn.metrics import r2_score
 from sklearn.tree import DecisionTreeRegressor
 import xgboost as xgb
 
+def runLocallyOrRemotely(Locally_Or_Remotely):
+    locally_or_remotely = Locally_Or_Remotely
+    if locally_or_remotely == 'y':
+        repo_location = "D:/OneDrive - Kyushu University/11_Article/03_RStudio/"
+    elif locally_or_remotely == 'n':
+        repo_location = "/home/usr6/q70176a/DP11/"
+    elif locally_or_remotely == 'wsl':
+        repo_location = "/mnt/d/OneDrive - Kyushu University/11_Article/03_RStudio/"
+    elif  locally_or_remotely == 'linux':
+        repo_location = "/mnt/d/OneDrive - Kyushu University/11_Article/03_RStudio/"
+    return repo_location
+
 def getXandY():
     result = pyreadr.read_r(REPO_LOCATION + "04_Data/99_dataset_to_python.rds")
     df = pd.DataFrame(result[None])
@@ -86,12 +98,55 @@ def testRfModel(X, y):
     print(f"rf 1000 trees Accuracy: {rfaccuracy:.4f}")
     
     return None
+
+def testXgbModel(X, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                        test_size=0.1, 
+                                                        random_state=42) 
+    
+    xgmodel = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=10,
+                               seed=42, n_jobs=-1) 
+    xgmodel.fit(X_train, y_train)
+    y_pred = xgmodel.predict(X_test)
+    xgaccuracy = r2_score(y_test, y_pred)
+    print(f"100 xg Accuracy: {xgaccuracy:.4f}")
+    
+    xgmodel = xgb.XGBRegressor(n_estimators=200, learning_rate=0.1, max_depth=10,
+                               seed=42, n_jobs=-1) 
+    xgmodel.fit(X_train, y_train)
+    y_pred = xgmodel.predict(X_test)
+    xgaccuracy = r2_score(y_test, y_pred)
+    print(f"200 xg Accuracy: {xgaccuracy:.4f}")
+    
+    xgmodel = xgb.XGBRegressor(n_estimators=300, learning_rate=0.1, max_depth=10,
+                               seed=42, n_jobs=-1) 
+    xgmodel.fit(X_train, y_train)
+    y_pred = xgmodel.predict(X_test)
+    xgaccuracy = r2_score(y_test, y_pred)
+    print(f"300 xg Accuracy: {xgaccuracy:.4f}")
+    
+    xgmodel = xgb.XGBRegressor(n_estimators=400, learning_rate=0.1, max_depth=10,
+                               seed=42, n_jobs=-1) 
+    xgmodel.fit(X_train, y_train)
+    y_pred = xgmodel.predict(X_test)
+    xgaccuracy = r2_score(y_test, y_pred)
+    print(f"400 xg Accuracy: {xgaccuracy:.4f}")
+    
+    xgmodel = xgb.XGBRegressor(n_estimators=500, learning_rate=0.1, max_depth=10,
+                               seed=42, n_jobs=-1) 
+    xgmodel.fit(X_train, y_train)
+    y_pred = xgmodel.predict(X_test)
+    xgaccuracy = r2_score(y_test, y_pred)
+    print(f"500 xg Accuracy: {xgaccuracy:.4f}")
+    
+    return None
     
 
-REPO_LOCATION = "D:/OneDrive - Kyushu University/11_Article/03_RStudio/"
+REPO_LOCATION = runLocallyOrRemotely('y')
 
 df, X, y = getXandY()
 
 TestModel(X, y)
-testRfModel(X, y)
+#testRfModel(X, y)
+testXgbModel(X, y)
 
