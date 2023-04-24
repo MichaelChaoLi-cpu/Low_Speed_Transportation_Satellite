@@ -65,6 +65,9 @@ plmtest(ols, type = "bp")
 
 rm(fem, ols, pdata, rem)
 
+dataset_to_python <- left_join(dataset_used.Tokyo, points_mesh.in.Tokyo %>% dplyr::select(-PrefID), by = 'GridID')
+saveRDS(dataset_to_python, file = "04_Data/99_dataset_to_python.rds")
+
 xy <- points_mesh.in.Tokyo[,c(1,2)]
 points_mesh.in.Tokyo <- SpatialPointsDataFrame(coords = xy, data = points_mesh.in.Tokyo,
                                                proj4string = points_mesh.in.GT@proj4string)
