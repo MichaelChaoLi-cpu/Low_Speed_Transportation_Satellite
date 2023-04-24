@@ -7,8 +7,9 @@ Created on Wed Apr 19 12:33:40 2023
 
 import pandas as pd
 import pyreadr
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import AdaBoostRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -31,20 +32,19 @@ def TestModel(X, y):
                                                         test_size=0.1, 
                                                         random_state=42) 
     
-    xgmodel = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=3,
-                               seed=42, n_jobs=6) 
+    xgmodel = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=10,
+                               seed=42, n_jobs=-1) 
     xgmodel.fit(X_train, y_train)
     y_pred = xgmodel.predict(X_test)
     xgaccuracy = r2_score(y_test, y_pred)
     print(f"xg Accuracy: {xgaccuracy:.4f}")
 
     
-    rfmodel = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=6)
+    rfmodel = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
     rfmodel.fit(X_train, y_train)
     y_pred = rfmodel.predict(X_test)
     rfaccuracy = r2_score(y_test, y_pred)
     print(f"rf Accuracy: {rfaccuracy:.4f}")
-
     
     base_estimator = DecisionTreeRegressor(max_depth=1)
     adamodel = AdaBoostRegressor(base_estimator=base_estimator, n_estimators=100, 
