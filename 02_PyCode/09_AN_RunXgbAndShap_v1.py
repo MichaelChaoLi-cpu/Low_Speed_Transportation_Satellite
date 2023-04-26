@@ -50,22 +50,15 @@ def trainBestModel(X, y):
     xgaccuracy = r2_score(y_test, y_pred)
     print(f"100 xg Accuracy: {xgaccuracy:.4f}")
     
-    return xgmodel, X_train, X_test, y_train, y_test
+    print("model should be full size, so all data are in")
+    xgmodel = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=10,
+                               seed=42, n_jobs=-1) 
+    xgmodel.fit(X, y)
+    return xgmodel
     
 def getShap(model, X_test):
     explainer = TreeExplainer(model)
-    shap_value = explainer.shap_values(X_test)
-    return shap_value
-
-def getShapTree(model, X):
-    explainer = shap.explainers.Tree(model)
-    shap_value = explainer.shap_values(X)
-    return shap_value
-
-def getShapKernel(model, X, y):
-    _, X_use, _, _ = train_test_split(X, y, test_size=1000, random_state=42)
-    explainer = shap.KernelExplainer(model.predict, X_use)
-    shap_value = explainer.shap_values(X)
+    shap_value = explainer.shap_values(X_test, check_additivity=False)
     return shap_value
 
 REPO_LOCATION = runLocallyOrRemotely('y')
@@ -73,10 +66,8 @@ REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
 
 df, X, y = getXandY()
 
-model, X_train, X_test, y_train, y_test = trainBestModel(X, y)
+model = trainBestModel(X, y)
 shap_value = getShap(model, X)
-#shap_value_tree = getShapTree(model, X.iloc[0:10,:])
-#shap_value_kernel = getShapKernel(rfmodel, X, y)
 
 dump(shap_value, REPO_RESULT_LOCATION + '02_TreeShap.joblib')      
 
