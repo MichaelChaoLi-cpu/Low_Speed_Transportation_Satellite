@@ -79,9 +79,10 @@ def getShap(model, X_test):
     shap_value = explainer.shap_values(X_test, check_additivity=False)
     return shap_value
 
+REPO_LOCATION = runLocallyOrRemotely('y')
+REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
+
 if __name__ == '__main__':
-    REPO_LOCATION = runLocallyOrRemotely('y')
-    REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
     df, X, y = getXandYinFirstDifference()
     model = trainBestModel(X, y)
     shap_value = getShap(model, X)
