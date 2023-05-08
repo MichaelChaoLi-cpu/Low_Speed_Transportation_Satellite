@@ -71,8 +71,6 @@ def trainBestModel(X, y):
     print(f"100 xg Accuracy: {xgaccuracy:.4f}")
     
     print("model should be full size, so all data are in")
-    xgmodel = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=10,
-                               seed=42, n_jobs=-1) 
     xgmodel.fit(X, y)
     return xgmodel
 
@@ -81,13 +79,14 @@ def getShap(model, X_test):
     shap_value = explainer.shap_values(X_test, check_additivity=False)
     return shap_value
 
-
-REPO_LOCATION = runLocallyOrRemotely('y')
-df, X, y = getXandYinFirstDifference()
-model = trainBestModel(X, y)
-shap_value = getShap(model, X)
-
-dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib')      
+if __name__ == '__main__':
+    REPO_LOCATION = runLocallyOrRemotely('y')
+    REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
+    df, X, y = getXandYinFirstDifference()
+    model = trainBestModel(X, y)
+    shap_value = getShap(model, X)
+    
+    dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib')      
 
 
 
