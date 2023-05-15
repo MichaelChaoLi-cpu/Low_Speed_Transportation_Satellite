@@ -58,36 +58,51 @@ def getXandYinFirstDifference():
     y = df_diffencemerge.iloc[:,0:1].copy()
     return df_diffencemerge, X, y
 
-def trainBestModel(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                        test_size=0.1, 
-                                                        random_state=42) 
-    
-    xgmodel = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=10,
-                               seed=42, n_jobs=-1) 
-    xgmodel.fit(X_train, y_train)
-    y_pred = xgmodel.predict(X_test)
-    xgaccuracy = r2_score(y_test, y_pred)
-    print(f"100 xg Accuracy: {xgaccuracy:.4f}")
-    
-    print("model should be full size, so all data are in")
-    xgmodel.fit(X, y)
-    return xgmodel
+def getBestModel(X, y, *args, **kwargs):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    xgb_regressor = xgb.XGBRegressor(**kwargs)
+    xgb_regressor.fit(X_train, y_train)
+    y_pred = xgb_regressor.predict(X_test)
+    accuracy = r2_score(y_test, y_pred)
+    print(f"CV; Accuracy: {accuracy*100:.2f}%")
+    xgb_regressor = xgb.XGBRegressor()
+    xgb_regressor.fit(X, y)
+    y_pred = xgb_regressor.predict(X)
+    accuracy = r2_score(y, y_pred)    
+    print(f"ALL; Accuracy: {accuracy*100:.2f}%")
+    return xgb_regressor
 
 def getShap(model, X_test):
     explainer = TreeExplainer(model)
     shap_value = explainer.shap_values(X_test, check_additivity=False)
     return shap_value
 
+def makeDatasetWithShap(df, shap_value):
+    X_colname = df.columns
+    X_colname = X_colname[1:]
+    shap_colnames = X_colname + "_shap"
+    df.reset_index(inplace=True)
+    shap_value.columns = shap_colnames
+    dataset_to_analysis = pd.concat([df, shap_value], axis=1)
+    return dataset_to_analysis
+
 REPO_LOCATION = runLocallyOrRemotely('y')
 REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
 
 if __name__ == '__main__':
     df, X, y = getXandYinFirstDifference()
-    model = trainBestModel(X, y)
+    model = getBestModel(X, y, n_jobs=-1, n_estimators = 500, learning_rate = 0.5,
+                         max_depth = 9, min_child_weight = 5, gamma = 0, 
+                         subsample = 1, colsample_bytree = 1, reg_alpha = 0.5,
+                         reg_lambda = 0.9)
     shap_value = getShap(model, X)
     
-    dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib')      
+    dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib') 
+    shap_value = pd.DataFrame(shap_value)
+    
+    dataset_to_analysis = makeDatasetWithShap(df, shap_value)
+    dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv', index=False)  
 
 
 
