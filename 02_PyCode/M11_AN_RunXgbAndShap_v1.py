@@ -47,7 +47,11 @@ def getXandYinFirstDifference():
         df_before = df_to_firstdifference[df_to_firstdifference['time'] == time_index]
         df_after = df_to_firstdifference[df_to_firstdifference['time'] == time_stamp[i+1]]
         df_difference = df_after - df_before
+        #subset = df_before[df_before['lowSpeedDensity'] == 0] ### solve Y
+        #df_before.loc[subset.index, 'lowSpeedDensity'] = 1 ### solve Y
+        #df_difference['lowSpeedDensity'] = (df_after['lowSpeedDensity'] - df_before['lowSpeedDensity'])/df_before['lowSpeedDensity'] * 100
         df_difference['time'] =  time_index
+        df_difference['month'] = time_stamp[i+1]%100 
         df_diffencemerge = pd.concat([df_diffencemerge, df_difference])
     df_diffencemerge.index.name = 'GridID'
     df_diffencemerge.reset_index(inplace=True)
@@ -57,6 +61,29 @@ def getXandYinFirstDifference():
     X = df_diffencemerge.iloc[:,1:df_diffencemerge.shape[1]].copy()
     y = df_diffencemerge.iloc[:,0:1].copy()
     return df_diffencemerge, X, y
+
+def getXandStanY():
+    result = pyreadr.read_r(REPO_LOCATION + "04_Data/99_dataset_to_python.rds")
+    df = pd.DataFrame(result[None])
+    df = df.drop(columns=['TimeVariable', 'PrefID'])
+    df.set_index(['GridID', 'time'], inplace=True)
+    df = df[['lowSpeedDensity', 'Temperature', 'NTL',
+             'ter_pressure', 'NDVI', 'humidity', 'precipitation', 
+             'speedwind', 'mg_m2_troposphere_no2', 'ozone',
+             'UVAerosolIndex', 'PBLH', 'prevalance', 'mortality',
+             'emergence', 'year', 'month']]
+    X = df.iloc[:,1:df.shape[1]].copy()
+    y = df.iloc[:,0:1].copy()
+    y_stan = y.reset_index()
+    mean_y = y_stan.groupby('GridID')['lowSpeedDensity'].mean().to_frame().rename(columns={'lowSpeedDensity': 'mean'}).reset_index()
+    std_y = y_stan.groupby('GridID')['lowSpeedDensity'].std().to_frame().rename(columns={'lowSpeedDensity': 'std'}).reset_index()
+    merge_y = y_stan.merge(mean_y, on='GridID', how='left')
+    merge_y = merge_y.merge(std_y, on='GridID', how='left')
+    merge_y['stan_y'] = (merge_y['lowSpeedDensity'] - merge_y['mean'])/ merge_y['std']
+    merge_y.set_index(['GridID', 'time'], inplace=True)
+    merge_y = merge_y[['stan_y']]
+    return df, X, merge_y
+
 
 def getBestModel(X, y, *args, **kwargs):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
@@ -78,14 +105,42 @@ def getShap(model, X_test):
     shap_value = explainer.shap_values(X_test, check_additivity=False)
     return shap_value
 
-def makeDatasetWithShap(df, shap_value):
+def getAverageCellY():
+    result = pyreadr.read_r(REPO_LOCATION + "04_Data/99_dataset_to_python.rds")
+    df_ave = pd.DataFrame(result[None])
+    df_ave = df_ave[['GridID', 'lowSpeedDensity']]
+    mean_lowSpeedDensity = df_ave.groupby('GridID')['lowSpeedDensity'].mean().to_frame().reset_index()
+    df_diffencemerge = pd.DataFrame(columns= mean_lowSpeedDensity.columns)
+    time_stamp = [201901, 201902, 201903, 201904, 201905, 201906,
+                  201907, 201908, 201909, 201910, 201911, 201912,
+                  202001, 202002, 202003, 202004, 202005, 202006,
+                  202007, 202008, 202009, 202010, 202011, 202012
+                  ]
+    for i, time_index in enumerate(time_stamp[:-1]):
+        df_new = mean_lowSpeedDensity
+        df_new['time'] =  time_index
+        df_diffencemerge = pd.concat([df_diffencemerge, df_new])
+    df_diffencemerge.set_index(['GridID', 'time'], inplace=True)
+    return df_diffencemerge
+
+def makeDatasetWithShap(df, shap_value_input):
+    shap_value = shap_value_input.copy()
+    index_df = df.reset_index()[['GridID', 'time']]
+    shap_value_pre = shap_value.copy()
+    shap_value_pre = pd.concat([index_df, shap_value_pre], axis=1).set_index(['GridID', 'time'])
+    mean_value = getAverageCellY().rename(columns={'lowSpeedDensity': 'lowSpeedDensity_mean'})
+    shap_value_pre = shap_value_pre.div(mean_value['lowSpeedDensity_mean'], axis=0)
     X_colname = df.columns
     X_colname = X_colname[1:]
     shap_colnames = X_colname + "_shap"
     df.reset_index(inplace=True)
     shap_value.columns = shap_colnames
-    dataset_to_analysis = pd.concat([df, shap_value], axis=1)
+    shap_value_pre.columns = X_colname + "_shapMean"
+    dataset_to_analysis = pd.concat([df, shap_value], axis=1).set_index(['GridID', 'time'])
+    #dataset_to_analysis = pd.concat([dataset_to_analysis, shap_value_pre], axis=1)
     return dataset_to_analysis
+
+
 
 REPO_LOCATION = runLocallyOrRemotely('y')
 REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
@@ -102,9 +157,20 @@ if __name__ == '__main__':
     shap_value = pd.DataFrame(shap_value)
     
     dataset_to_analysis = makeDatasetWithShap(df, shap_value)
-    dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv', index=False)  
-
-
+    dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
+    
+    df, X, y = getXandStanY()
+    model = getBestModel(X, y, n_jobs=-1, n_estimators = 500, learning_rate = 0.5,
+                         max_depth = 9, min_child_weight = 5, gamma = 0, 
+                         subsample = 1, colsample_bytree = 1, reg_alpha = 0.5,
+                         reg_lambda = 0.9)
+    shap_value = getShap(model, X)
+    
+    dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib') 
+    shap_value = pd.DataFrame(shap_value)
+    
+    dataset_to_analysis = makeDatasetWithShap(df, shap_value)
+    dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
 
 
 

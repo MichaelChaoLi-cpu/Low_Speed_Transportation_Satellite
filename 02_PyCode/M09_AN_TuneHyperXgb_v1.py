@@ -6,7 +6,7 @@ Created on Mon May  8 13:56:41 2023
 """
 
 from M11_AN_RunXgbAndShap_v1 import runLocallyOrRemotely
-from M11_AN_RunXgbAndShap_v1 import getXandYinFirstDifference
+from M11_AN_RunXgbAndShap_v1 import getXandStanY
 
 import pandas as pd
 import pyreadr
@@ -218,13 +218,16 @@ def testBestModel(X, y, *args, **kwargs):
 if __name__ == '__main__':
     REPO_LOCATION = runLocallyOrRemotely('y')
     REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
-    df, X, y = getXandYinFirstDifference()
+    df, X, y = getXandStanY()
     
     run = False
     if run:
         best_score, best_n_estimators = tuningHyperNestimator(X, y, 
                                                               [100, 200, 300, 400, 500,
-                                                               600, 700, 800, 900, 1000])
+                                                               600, 700, 800, 900, 1000,
+                                                               1100, 1200, 1300, 1400,
+                                                               1500, 1600, 1700, 1800,
+                                                               1900, 2000])
         ### n_estimators = 500
         best_score, best_lr = tuningHyperLr(X, y, 500, 
                                             [0.01, 0.05, 0.1, 0.2, 0.5, 0.6, 0.8])
