@@ -228,7 +228,7 @@ if __name__ == '__main__':
                                                                1100, 1200, 1300, 1400,
                                                                1500, 1600, 1700, 1800,
                                                                1900, 2000])
-        ### n_estimators = 500
+        ### n_estimators = 3000
         best_score, best_lr = tuningHyperLr(X, y, 500, 
                                             [0.01, 0.05, 0.1, 0.2, 0.5, 0.6, 0.8])
         ### learning_rate = 0.5

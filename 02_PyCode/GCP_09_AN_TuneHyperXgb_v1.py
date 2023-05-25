@@ -88,6 +88,155 @@ def tuningHyperMaxDepth(X, y, n_estimators, learning_rate,
             best_parameter = interest
     return best_score, best_parameter
 
+def tuningHyperChild(X, y, n_estimators, learning_rate, max_depth,
+                     tuning_list):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    best_score = 0
+    best_parameter = 0
+    for interest in tuning_list:
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+                                         learning_rate = learning_rate, 
+                                         max_depth = max_depth,
+                                         min_child_weight = interest)
+        xgb_regressor.fit(X_train, y_train)
+        y_pred = xgb_regressor.predict(X_test)
+        accuracy = r2_score(y_test, y_pred)
+        print(f"Parameter: {interest}; Accuracy: {accuracy*100:.2f}%")
+        if accuracy > best_score:
+            best_score = accuracy
+            best_parameter = interest
+    return best_score, best_parameter
+
+def tuningHyperGamma(X, y, n_estimators, learning_rate, max_depth, min_child_weight,
+                     tuning_list):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    best_score = 0
+    best_parameter = 0
+    for interest in tuning_list:
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+                                         learning_rate = learning_rate, 
+                                         max_depth = max_depth, min_child_weight = 5,
+                                         gamma = interest)
+        xgb_regressor.fit(X_train, y_train)
+        y_pred = xgb_regressor.predict(X_test)
+        accuracy = r2_score(y_test, y_pred)
+        print(f"Parameter: {interest}; Accuracy: {accuracy*100:.2f}%")
+        if accuracy > best_score:
+            best_score = accuracy
+            best_parameter = interest
+    return best_score, best_parameter
+
+def tuningHyperSubsample(X, y, n_estimators, learning_rate, 
+                         max_depth, min_child_weight, gamma,
+                         tuning_list):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    best_score = 0
+    best_parameter = 0
+    for interest in tuning_list:
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+                                         learning_rate = learning_rate, 
+                                         max_depth = max_depth, min_child_weight = 5,
+                                         gamma = gamma, subsample = interest)
+        xgb_regressor.fit(X_train, y_train)
+        y_pred = xgb_regressor.predict(X_test)
+        accuracy = r2_score(y_test, y_pred)
+        print(f"Parameter: {interest}; Accuracy: {accuracy*100:.2f}%")
+        if accuracy > best_score:
+            best_score = accuracy
+            best_parameter = interest
+    return best_score, best_parameter
+
+
+def tuningHypercolsample_bytree(X, y, n_estimators, learning_rate, 
+                                max_depth, min_child_weight, gamma,
+                                subsample,
+                                tuning_list):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    best_score = 0
+    best_parameter = 0
+    for interest in tuning_list:
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+                                         learning_rate = learning_rate, 
+                                         max_depth = max_depth, min_child_weight = 5,
+                                         gamma = gamma, subsample = subsample,
+                                         colsample_bytree = interest)
+        xgb_regressor.fit(X_train, y_train)
+        y_pred = xgb_regressor.predict(X_test)
+        accuracy = r2_score(y_test, y_pred)
+        print(f"Parameter: {interest}; Accuracy: {accuracy*100:.2f}%")
+        if accuracy > best_score:
+            best_score = accuracy
+            best_parameter = interest
+    return best_score, best_parameter
+
+def tuningHyperreg_alpha(X, y, n_estimators, learning_rate, 
+                                max_depth, min_child_weight, gamma,
+                                subsample, colsample_bytree,
+                                tuning_list):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    best_score = 0
+    best_parameter = 0
+    for interest in tuning_list:
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+                                         learning_rate = learning_rate, 
+                                         max_depth = max_depth, min_child_weight = 5,
+                                         gamma = gamma, subsample = subsample,
+                                         colsample_bytree = colsample_bytree,
+                                         reg_alpha = interest)
+        xgb_regressor.fit(X_train, y_train)
+        y_pred = xgb_regressor.predict(X_test)
+        accuracy = r2_score(y_test, y_pred)
+        print(f"Parameter: {interest}; Accuracy: {accuracy*100:.2f}%")
+        if accuracy > best_score:
+            best_score = accuracy
+            best_parameter = interest
+    return best_score, best_parameter
+
+def tuningHyperreg_lambda(X, y, n_estimators, learning_rate, 
+                                max_depth, min_child_weight, gamma,
+                                subsample, colsample_bytree, reg_alpha,
+                                tuning_list):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    best_score = 0
+    best_parameter = 0
+    for interest in tuning_list:
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+                                         learning_rate = learning_rate, 
+                                         max_depth = max_depth, min_child_weight = 5,
+                                         gamma = gamma, subsample = subsample,
+                                         colsample_bytree = colsample_bytree,
+                                         reg_alpha = reg_alpha,
+                                         reg_lambda = interest)
+        xgb_regressor.fit(X_train, y_train)
+        y_pred = xgb_regressor.predict(X_test)
+        accuracy = r2_score(y_test, y_pred)
+        print(f"Parameter: {interest}; Accuracy: {accuracy*100:.2f}%")
+        if accuracy > best_score:
+            best_score = accuracy
+            best_parameter = interest
+    return best_score, best_parameter
+
+def testBestModel(X, y, *args, **kwargs):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    xgb_regressor = xgb.XGBRegressor(**kwargs)
+    xgb_regressor.fit(X_train, y_train)
+    y_pred = xgb_regressor.predict(X_test)
+    accuracy = r2_score(y_test, y_pred)
+    print(f"CV; Accuracy: {accuracy*100:.2f}%")
+    xgb_regressor = xgb.XGBRegressor()
+    xgb_regressor.fit(X, y)
+    y_pred = xgb_regressor.predict(X)
+    accuracy = r2_score(y, y_pred)    
+    print(f"ALL; Accuracy: {accuracy*100:.2f}%")
+    return None
+
 REPO_LOCATION = "/home/gcp_cpu/DP11/"
 REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
 
@@ -108,4 +257,41 @@ best_score, best_lr = tuningHyperLr(X, y, 3000,
 best_score, best_maxdepth = tuningHyperMaxDepth(X, y, 3000, 0.5,
                                                 [3, 4, 5, 6, 7, 8, 9, 10,
                                                  11, 12, 13, 14, 15])
+### max_depth = 7
+best_score, best_child = tuningHyperChild(X, y, 3000, 0.5, 7, 
+                                          [1, 2, 3, 4, 5, 
+                                           6, 7, 8, 9, 10])
+### min_child_weight=2
+best_score, best_gamma = tuningHyperGamma(X, y, 3000, 0.5, 7, 2,
+                                             [0, 1, 2, 3, 4, 5])
+### gamma = 0
+best_score, best_Subsample = tuningHyperSubsample(X, y, 3000, 0.5, 7, 2,
+                                                  0, 
+                                                  [0.5, 0.6, 0.7, 0.8, 0.9, 1])
+### subsample = 1
+best_score, best_colsample_bytree = tuningHypercolsample_bytree(X, y, 3000, 0.5, 7, 2,
+                                                                0, 1,
+                                                                [0.1, 0.2, 0.3, 0.4, 0.5,
+                                                                 0.6, 0.7, 0.8, 0.9, 1])
+### colsample_bytree = 0.6
+best_score, best_reg_alpha = tuningHyperreg_alpha(X, y, 3000, 0.5, 7, 2,
+                                                  0, 1, 0.6, 
+                                                  [0, 0.01, 0.02, 0.03, 0.04, 0.05,
+                                                   0.06, 0.07, 0.08, 0.09, 0.1,
+                                                   0.11, 0.12, 0.13, 0.14, 0.15,
+                                                   0.16, 0.17, 0.18, 0.19, 0.2])
+### reg_alpha = 0.11
+best_score, best_reg_lambda = tuningHyperreg_lambda(X, y, 3000, 0.5, 7, 2,
+                                                    0, 1, 0.6, 0.11,
+                                                    [0, 0.01, 0.02, 0.03, 0.04, 0.05,
+                                                     0.06, 0.07, 0.08, 0.09, 0.1,
+                                                     0.11, 0.12, 0.13, 0.14, 0.15,
+                                                     0.16, 0.17, 0.18, 0.19, 0.2])
+### reg_lambda = 0.11
+
+testBestModel(X, y, n_jobs=-1, n_estimators = 3000, learning_rate = 0.5,
+              max_depth = 7, min_child_weight = 2, gamma = 0, 
+              subsample = 1, colsample_bytree = 0.6, reg_alpha = 0.11,
+              reg_lambda = 0.11)
+
 

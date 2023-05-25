@@ -146,24 +146,24 @@ REPO_LOCATION = runLocallyOrRemotely('y')
 REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
 
 if __name__ == '__main__':
-    df, X, y = getXandYinFirstDifference()
-    model = getBestModel(X, y, n_jobs=-1, n_estimators = 500, learning_rate = 0.5,
-                         max_depth = 9, min_child_weight = 5, gamma = 0, 
-                         subsample = 1, colsample_bytree = 1, reg_alpha = 0.5,
-                         reg_lambda = 0.9)
-    shap_value = getShap(model, X)
+    #df, X, y = getXandYinFirstDifference()
+    #model = getBestModel(X, y, n_jobs=-1, n_estimators = 500, learning_rate = 0.5,
+    #                     max_depth = 9, min_child_weight = 5, gamma = 0, 
+    #                     subsample = 1, colsample_bytree = 1, reg_alpha = 0.5,
+    #                     reg_lambda = 0.9)
+    #shap_value = getShap(model, X)
     
-    dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib') 
-    shap_value = pd.DataFrame(shap_value)
+    #dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib') 
+    #shap_value = pd.DataFrame(shap_value)
     
-    dataset_to_analysis = makeDatasetWithShap(df, shap_value)
-    dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
+    #dataset_to_analysis = makeDatasetWithShap(df, shap_value)
+    #dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
     
     df, X, y = getXandStanY()
-    model = getBestModel(X, y, n_jobs=-1, n_estimators = 500, learning_rate = 0.5,
-                         max_depth = 9, min_child_weight = 5, gamma = 0, 
-                         subsample = 1, colsample_bytree = 1, reg_alpha = 0.5,
-                         reg_lambda = 0.9)
+    model = getBestModel(X, y, n_jobs=-1, n_estimators = 3000, learning_rate = 0.5,
+                            max_depth = 7, min_child_weight = 2, gamma = 0, 
+                            subsample = 1, colsample_bytree = 0.6, reg_alpha = 0.11,
+                            reg_lambda = 0.11)
     shap_value = getShap(model, X)
     
     dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib') 
