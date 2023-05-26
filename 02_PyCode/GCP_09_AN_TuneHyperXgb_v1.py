@@ -15,7 +15,7 @@ from sklearn.metrics import r2_score
 import xgboost as xgb
 
 def getXandStanY():
-    result = pyreadr.read_r(REPO_LOCATION + "99_dataset_to_python.rds")
+    result = pyreadr.read_r(REPO_LOCATION + "04_Data/99_dataset_to_python.rds")
     df = pd.DataFrame(result[None])
     df = df.drop(columns=['TimeVariable', 'PrefID'])
     df.set_index(['GridID', 'time'], inplace=True)
@@ -23,7 +23,7 @@ def getXandStanY():
              'ter_pressure', 'NDVI', 'humidity', 'precipitation', 
              'speedwind', 'mg_m2_troposphere_no2', 'ozone',
              'UVAerosolIndex', 'PBLH', 'prevalance', 'mortality',
-             'emergence', 'year', 'month']]
+             'emergence', 'year', 'month', 'x', 'y']]
     X = df.iloc[:,1:df.shape[1]].copy()
     y = df.iloc[:,0:1].copy()
     y_stan = y.reset_index()
@@ -33,8 +33,9 @@ def getXandStanY():
     merge_y = merge_y.merge(std_y, on='GridID', how='left')
     merge_y['stan_y'] = (merge_y['lowSpeedDensity'] - merge_y['mean'])/ merge_y['std']
     merge_y.set_index(['GridID', 'time'], inplace=True)
-    merge_y = merge_y[['stan_y']]
-    return df, X, merge_y
+    y_output = merge_y[['stan_y']]
+    df = pd.concat([X, merge_y], axis=1)
+    return df, X, y_output
 
 def tuningHyperNestimator(X, y, n_estimators_list):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
@@ -257,15 +258,15 @@ best_score, best_lr = tuningHyperLr(X, y, 3000,
 best_score, best_maxdepth = tuningHyperMaxDepth(X, y, 3000, 0.5,
                                                 [3, 4, 5, 6, 7, 8, 9, 10,
                                                  11, 12, 13, 14, 15])
-### max_depth = 7
-best_score, best_child = tuningHyperChild(X, y, 3000, 0.5, 7, 
+### max_depth = 11
+best_score, best_child = tuningHyperChild(X, y, 3000, 0.5, 11, 
                                           [1, 2, 3, 4, 5, 
                                            6, 7, 8, 9, 10])
-### min_child_weight=2
-best_score, best_gamma = tuningHyperGamma(X, y, 3000, 0.5, 7, 2,
+### min_child_weight=1
+best_score, best_gamma = tuningHyperGamma(X, y, 3000, 0.5, 11, 1,
                                              [0, 1, 2, 3, 4, 5])
 ### gamma = 0
-best_score, best_Subsample = tuningHyperSubsample(X, y, 3000, 0.5, 7, 2,
+best_score, best_Subsample = tuningHyperSubsample(X, y, 3000, 0.5, 11, 1,
                                                   0, 
                                                   [0.5, 0.6, 0.7, 0.8, 0.9, 1])
 ### subsample = 1

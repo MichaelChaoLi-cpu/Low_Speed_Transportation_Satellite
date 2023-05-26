@@ -81,8 +81,9 @@ def getXandStanY():
     merge_y = merge_y.merge(std_y, on='GridID', how='left')
     merge_y['stan_y'] = (merge_y['lowSpeedDensity'] - merge_y['mean'])/ merge_y['std']
     merge_y.set_index(['GridID', 'time'], inplace=True)
-    merge_y = merge_y[['stan_y']]
-    return df, X, merge_y
+    y_output = merge_y[['stan_y']]
+    df = pd.concat([X, merge_y], axis=1)
+    return df, X, y_output
 
 
 def getBestModel(X, y, *args, **kwargs):
@@ -130,8 +131,8 @@ def makeDatasetWithShap(df, shap_value_input):
     shap_value_pre = pd.concat([index_df, shap_value_pre], axis=1).set_index(['GridID', 'time'])
     mean_value = getAverageCellY().rename(columns={'lowSpeedDensity': 'lowSpeedDensity_mean'})
     shap_value_pre = shap_value_pre.div(mean_value['lowSpeedDensity_mean'], axis=0)
-    X_colname = df.columns
-    X_colname = X_colname[1:]
+    X_colname = df.columns[:-4]
+    X_colname = X_colname
     shap_colnames = X_colname + "_shap"
     df.reset_index(inplace=True)
     shap_value.columns = shap_colnames
