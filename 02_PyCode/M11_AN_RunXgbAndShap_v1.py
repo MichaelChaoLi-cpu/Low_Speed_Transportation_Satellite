@@ -71,7 +71,7 @@ def getXandStanY():
              'ter_pressure', 'NDVI', 'humidity', 'precipitation', 
              'speedwind', 'mg_m2_troposphere_no2', 'ozone',
              'UVAerosolIndex', 'PBLH', 'prevalance', 'mortality',
-             'emergence', 'year', 'month']]
+             'emergence', 'year', 'month', 'x', 'y']]
     X = df.iloc[:,1:df.shape[1]].copy()
     y = df.iloc[:,0:1].copy()
     y_stan = y.reset_index()
@@ -162,9 +162,9 @@ if __name__ == '__main__':
     
     df, X, y = getXandStanY()
     model = getBestModel(X, y, n_jobs=-1, n_estimators = 3000, learning_rate = 0.5,
-                            max_depth = 7, min_child_weight = 2, gamma = 0, 
-                            subsample = 1, colsample_bytree = 0.6, reg_alpha = 0.11,
-                            reg_lambda = 0.11)
+                         max_depth = 11, min_child_weight = 1, gamma = 0, 
+                         subsample = 1, colsample_bytree = 0.4, reg_alpha = 1,
+                         reg_lambda = 1)
     shap_value = getShap(model, X)
     
     dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib') 
