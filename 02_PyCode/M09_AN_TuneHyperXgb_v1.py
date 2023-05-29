@@ -127,7 +127,8 @@ def tuningHyperGamma(X, y, n_estimators, learning_rate, max_depth, min_child_wei
     for interest in tuning_list:
         xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
                                          learning_rate = learning_rate, 
-                                         max_depth = max_depth, min_child_weight = 5,
+                                         max_depth = max_depth, 
+                                         min_child_weight = min_child_weight,
                                          gamma = interest)
         xgb_regressor.fit(X_train, y_train)
         y_pred = xgb_regressor.predict(X_test)
@@ -148,7 +149,8 @@ def tuningHyperSubsample(X, y, n_estimators, learning_rate,
     for interest in tuning_list:
         xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
                                          learning_rate = learning_rate, 
-                                         max_depth = max_depth, min_child_weight = 5,
+                                         max_depth = max_depth, 
+                                         min_child_weight = min_child_weight,
                                          gamma = gamma, subsample = interest)
         xgb_regressor.fit(X_train, y_train)
         y_pred = xgb_regressor.predict(X_test)
@@ -170,7 +172,8 @@ def tuningHypercolsample_bytree(X, y, n_estimators, learning_rate,
     for interest in tuning_list:
         xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
                                          learning_rate = learning_rate, 
-                                         max_depth = max_depth, min_child_weight = 5,
+                                         max_depth = max_depth, 
+                                         min_child_weight = min_child_weight,
                                          gamma = gamma, subsample = subsample,
                                          colsample_bytree = interest)
         xgb_regressor.fit(X_train, y_train)
@@ -193,7 +196,8 @@ def tuningHyperreg_alpha(X, y, n_estimators, learning_rate,
     for interest in tuning_list:
         xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
                                          learning_rate = learning_rate, 
-                                         max_depth = max_depth, min_child_weight = 5,
+                                         max_depth = max_depth, 
+                                         min_child_weight = min_child_weight,
                                          gamma = gamma, subsample = subsample,
                                          colsample_bytree = colsample_bytree,
                                          reg_alpha = interest)
@@ -217,7 +221,8 @@ def tuningHyperreg_lambda(X, y, n_estimators, learning_rate,
     for interest in tuning_list:
         xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
                                          learning_rate = learning_rate, 
-                                         max_depth = max_depth, min_child_weight = 5,
+                                         max_depth = max_depth, 
+                                         min_child_weight = min_child_weight,
                                          gamma = gamma, subsample = subsample,
                                          colsample_bytree = colsample_bytree,
                                          reg_alpha = reg_alpha,
@@ -274,7 +279,7 @@ if __name__ == '__main__':
                                                    6, 7, 8, 9, 10])
         ### min_child_weight = 5
         best_score, best_gamma = tuningHyperGamma(X, y, best_n_estimators, best_lr,
-                                                  best_child,
+                                                  best_maxdepth, best_child,
                                                   [0, 1, 2, 3, 4, 5])
         ### gamma = 0
         best_score, best_Subsample = tuningHyperSubsample(X, y, best_n_estimators, best_lr,
