@@ -244,7 +244,7 @@ def testBestModel(X, y, *args, **kwargs):
     y_pred = xgb_regressor.predict(X_test)
     accuracy = r2_score(y_test, y_pred)
     print(f"CV; Accuracy: {accuracy*100:.2f}%")
-    xgb_regressor = xgb.XGBRegressor()
+    xgb_regressor = xgb.XGBRegressor(**kwargs)
     xgb_regressor.fit(X, y)
     y_pred = xgb_regressor.predict(X)
     accuracy = r2_score(y, y_pred)    
