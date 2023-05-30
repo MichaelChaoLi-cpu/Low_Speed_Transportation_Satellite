@@ -272,12 +272,12 @@ if __name__ == '__main__':
         best_score, best_maxdepth = tuningHyperMaxDepth(X, y, best_n_estimators, best_lr,
                                                         [3, 4, 5, 6, 7, 8, 9, 10,
                                                          11, 12, 13, 14, 15])
-        ### max_depth = 9
+        ### max_depth = 11
         best_score, best_child = tuningHyperChild(X, y, best_n_estimators, best_lr,
                                                   best_maxdepth,
                                                   [1, 2, 3, 4, 5, 
                                                    6, 7, 8, 9, 10])
-        ### min_child_weight = 5
+        ### min_child_weight = 1
         best_score, best_gamma = tuningHyperGamma(X, y, best_n_estimators, best_lr,
                                                   best_maxdepth, best_child,
                                                   [0, 1, 2, 3, 4, 5])
@@ -299,7 +299,7 @@ if __name__ == '__main__':
                                                           best_Subsample, best_colsample_bytree,
                                                           [0.1, 0.2, 0.3, 0.4, 0.5,
                                                            0.6, 0.7, 0.8, 0.9, 1])
-        ### reg_alpha = 0.5
+        ### reg_alpha = 0.4
         best_score, best_reg_lambda = tuningHyperreg_lambda(X, y, best_n_estimators, best_lr,
                                                             best_maxdepth, best_child,
                                                             best_gamma,
@@ -307,7 +307,7 @@ if __name__ == '__main__':
                                                             best_reg_alpha,
                                                             [0, 0.1, 0.2, 0.3, 0.4, 0.5,
                                                              0.6, 0.7, 0.8, 0.9, 1])        
-        ### reg_lambda = 0.9
+        ### reg_lambda = 1
         
     testBestModel(X, y, n_jobs=-1, n_estimators = best_n_estimators, 
                   learning_rate = best_lr,

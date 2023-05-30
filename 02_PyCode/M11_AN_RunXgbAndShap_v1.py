@@ -94,7 +94,7 @@ def getBestModel(X, y, *args, **kwargs):
     y_pred = xgb_regressor.predict(X_test)
     accuracy = r2_score(y_test, y_pred)
     print(f"CV; Accuracy: {accuracy*100:.2f}%")
-    xgb_regressor = xgb.XGBRegressor()
+    xgb_regressor = xgb.XGBRegressor(**kwargs)
     xgb_regressor.fit(X, y)
     y_pred = xgb_regressor.predict(X)
     accuracy = r2_score(y, y_pred)    
@@ -163,7 +163,7 @@ if __name__ == '__main__':
     df, X, y = getXandStanY()
     model = getBestModel(X, y, n_jobs=-1, n_estimators = 3000, learning_rate = 0.5,
                          max_depth = 11, min_child_weight = 1, gamma = 0, 
-                         subsample = 1, colsample_bytree = 0.4, reg_alpha = 1,
+                         subsample = 1, colsample_bytree = 1, reg_alpha = 0.4,
                          reg_lambda = 1)
     shap_value = getShap(model, X)
     
