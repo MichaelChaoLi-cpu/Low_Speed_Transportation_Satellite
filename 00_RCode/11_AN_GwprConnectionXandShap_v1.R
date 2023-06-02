@@ -46,7 +46,7 @@ GWPR.FEM.bandwidth.NTL <- # this is about fixed bandwidth
           SDF = points_mesh, adaptive = F, p = 2, bigdata = F,
           upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
           kernel = "bisquare",doParallel = T, cluster.number = 8, gradientIncrement = T,
-          GI.step = 0.0025, GI.upper = 0.1, GI.lower = 0.0025)
+          GI.step = 0.0025, GI.upper = 0.06, GI.lower = 0.0025)
 saveRDS(GWPR.FEM.bandwidth.NTL, '03_Results/GWPR.FEM.bandwidth.NTL.rds')
 plot(GWPR.FEM.bandwidth.NTL[,1], GWPR.FEM.bandwidth.NTL[,2])
 
