@@ -70,20 +70,21 @@ def getXandStanY():
     df = df[['lowSpeedDensity', 'Temperature', 'NTL',
              'ter_pressure', 'NDVI', 'humidity', 'precipitation', 
              'speedwind', 'mg_m2_troposphere_no2', 'ozone',
-             'UVAerosolIndex', 'PBLH', 'prevalance', 'mortality',
+             'UVAerosolIndex', 'PBLH', 
+             'prevalance', 'mortality',
              'emergence', 'year', 'month', 'x', 'y']]
-    X = df.iloc[:,1:df.shape[1]].copy()
-    y = df.iloc[:,0:1].copy()
-    y_stan = y.reset_index()
-    mean_y = y_stan.groupby('GridID')['lowSpeedDensity'].mean().to_frame().rename(columns={'lowSpeedDensity': 'mean'}).reset_index()
-    std_y = y_stan.groupby('GridID')['lowSpeedDensity'].std().to_frame().rename(columns={'lowSpeedDensity': 'std'}).reset_index()
-    merge_y = y_stan.merge(mean_y, on='GridID', how='left')
-    merge_y = merge_y.merge(std_y, on='GridID', how='left')
-    merge_y['stan_y'] = (merge_y['lowSpeedDensity'] - merge_y['mean'])/ merge_y['std']
-    merge_y.set_index(['GridID', 'time'], inplace=True)
-    y_output = merge_y[['stan_y']]
-    df = pd.concat([X, merge_y], axis=1)
-    return df, X, y_output
+    df_output = df.copy()
+    aim_variable_list = ['lowSpeedDensity', 'Temperature', 'NTL',
+                         'ter_pressure', 'NDVI', 'humidity', 'precipitation', 
+                         'speedwind', 'mg_m2_troposphere_no2', 'ozone',
+                         'UVAerosolIndex', 'PBLH']
+    for variable_name in aim_variable_list:
+        df_output[variable_name] = df_output.groupby('GridID')[variable_name].transform(lambda x: (x - x.mean()) / x.std())
+    
+    X = df_output.iloc[:,1:df.shape[1]].copy()
+    y = df_output.iloc[:,0:1].copy()
+
+    return df, X, y
 
 
 def getBestModel(X, y, *args, **kwargs):
@@ -161,7 +162,7 @@ if __name__ == '__main__':
     #dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
     
     df, X, y = getXandStanY()
-    model = getBestModel(X, y, n_jobs=-1, n_estimators = 3000, learning_rate = 0.5,
+    model = getBestModel(X, y, n_jobs=4, n_estimators = 3000, learning_rate = 0.5,
                          max_depth = 11, min_child_weight = 1, gamma = 0, 
                          subsample = 1, colsample_bytree = 1, reg_alpha = 0.4,
                          reg_lambda = 1)
@@ -174,7 +175,32 @@ if __name__ == '__main__':
     dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
 
 
+"""
+def getXandStanY():
+    result = pyreadr.read_r(REPO_LOCATION + "04_Data/99_dataset_to_python.rds")
+    df = pd.DataFrame(result[None])
+    df = df.drop(columns=['TimeVariable', 'PrefID'])
+    df.set_index(['GridID', 'time'], inplace=True)
+    df = df[['lowSpeedDensity', 'Temperature', 'NTL',
+             'ter_pressure', 'NDVI', 'humidity', 'precipitation', 
+             'speedwind', 'mg_m2_troposphere_no2', 'ozone',
+             'UVAerosolIndex', 'PBLH', 
+             'prevalance', 'mortality',
+             'emergence', 'year', 'month', 'x', 'y']]
+    X = df.iloc[:,1:df.shape[1]].copy()
+    y = df.iloc[:,0:1].copy()
+    y_stan = y.reset_index()
+    mean_y = y_stan.groupby('GridID')['lowSpeedDensity'].mean().to_frame().rename(columns={'lowSpeedDensity': 'mean'}).reset_index()
+    std_y = y_stan.groupby('GridID')['lowSpeedDensity'].std().to_frame().rename(columns={'lowSpeedDensity': 'std'}).reset_index()
+    merge_y = y_stan.merge(mean_y, on='GridID', how='left')
+    merge_y = merge_y.merge(std_y, on='GridID', how='left')
+    merge_y['stan_y'] = (merge_y['lowSpeedDensity'] - merge_y['mean'])/ merge_y['std']
+    merge_y.set_index(['GridID', 'time'], inplace=True)
+    y_output = merge_y[['stan_y']]
+    df = pd.concat([X, merge_y], axis=1)
+    return df, X, y_output
 
+"""
 
 
 
