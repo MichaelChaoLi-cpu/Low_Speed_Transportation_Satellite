@@ -6,6 +6,7 @@ Created on Wed Apr 26 11:28:48 2023
 """
 
 from joblib import dump
+import os
 import pandas as pd
 import pyreadr
 from shap import TreeExplainer
@@ -21,8 +22,8 @@ def runLocallyOrRemotely(Locally_Or_Remotely):
         repo_location = "/home/usr6/q70176a/DP11/"
     elif locally_or_remotely == 'wsl':
         repo_location = "/mnt/d/OneDrive - Kyushu University/11_Article/03_RStudio/"
-    elif  locally_or_remotely == 'linux':
-        repo_location = "/mnt/d/OneDrive - Kyushu University/11_Article/03_RStudio/"
+    elif  locally_or_remotely == 'gcp':
+        repo_location =  os.path.join(os.getcwd(), 'DP11/')
     return repo_location
 
 def getXandYinFirstDifference():
@@ -84,7 +85,7 @@ def getXandStanY():
     X = df_output.iloc[:,1:df.shape[1]].copy()
     y = df_output.iloc[:,0:1].copy()
 
-    return df, X, y
+    return df_output, X, y
 
 
 def getBestModel(X, y, *args, **kwargs):
@@ -102,9 +103,9 @@ def getBestModel(X, y, *args, **kwargs):
     print(f"ALL; Accuracy: {accuracy*100:.2f}%")
     return xgb_regressor
 
-def getShap(model, X_test):
+def getShap(model, X):
     explainer = TreeExplainer(model)
-    shap_value = explainer.shap_values(X_test, check_additivity=False)
+    shap_value = explainer.shap_values(X, check_additivity=False)
     return shap_value
 
 def getAverageCellY():
@@ -162,9 +163,9 @@ if __name__ == '__main__':
     #dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
     
     df, X, y = getXandStanY()
-    model = getBestModel(X, y, n_jobs=4, n_estimators = 3000, learning_rate = 0.5,
-                         max_depth = 11, min_child_weight = 1, gamma = 0, 
-                         subsample = 1, colsample_bytree = 1, reg_alpha = 0.4,
+    model = getBestModel(X, y, tree_method='gpu_hist', n_estimators = 3000, learning_rate = 0.5,
+                         max_depth = 12, min_child_weight = 1, gamma = 0, 
+                         subsample = 1, colsample_bytree = 1, reg_alpha = 0.5,
                          reg_lambda = 1)
     shap_value = getShap(model, X)
     
