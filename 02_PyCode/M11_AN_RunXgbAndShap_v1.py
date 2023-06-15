@@ -129,18 +129,11 @@ def getAverageCellY():
 def makeDatasetWithShap(df, shap_value_input):
     shap_value = shap_value_input.copy()
     index_df = df.reset_index()[['GridID', 'time']]
-    shap_value_pre = shap_value.copy()
-    shap_value_pre = pd.concat([index_df, shap_value_pre], axis=1).set_index(['GridID', 'time'])
-    mean_value = getAverageCellY().rename(columns={'lowSpeedDensity': 'lowSpeedDensity_mean'})
-    shap_value_pre = shap_value_pre.div(mean_value['lowSpeedDensity_mean'], axis=0)
-    X_colname = df.columns[:-4]
-    X_colname = X_colname
+    shap_value = pd.concat([index_df, shap_value], axis=1).set_index(['GridID', 'time'])
+    X_colname = df.columns[1:]
     shap_colnames = X_colname + "_shap"
-    df.reset_index(inplace=True)
     shap_value.columns = shap_colnames
-    shap_value_pre.columns = X_colname + "_shapMean"
-    dataset_to_analysis = pd.concat([df, shap_value], axis=1).set_index(['GridID', 'time'])
-    #dataset_to_analysis = pd.concat([dataset_to_analysis, shap_value_pre], axis=1)
+    dataset_to_analysis = pd.concat([df, shap_value], axis=1)
     return dataset_to_analysis
 
 

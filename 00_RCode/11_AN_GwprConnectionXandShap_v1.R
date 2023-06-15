@@ -175,6 +175,79 @@ plm_test(formula)
 formula <- PBLH_shap ~ PBLH
 plm_test(formula)
 
+#### second order test
+dataset_X2shap <- dataset_Xshap
+dataset_X2shap$Temperature2 <- dataset_X2shap$Temperature*dataset_X2shap$Temperature
+formula <- Temperature_shap ~ Temperature + Temperature2
+temp <- lm(formula, dataset_X2shap)
+summary(temp)
+
+dataset_X2shap$NTL2 <- dataset_X2shap$NTL *dataset_X2shap$NTL
+formula <- NTL_shap ~ NTL + NTL2
+NTL <- lm(formula, dataset_X2shap)
+summary(NTL)
+
+dataset_X2shap$ter_pressure2 <- dataset_X2shap$ter_pressure *dataset_X2shap$ter_pressure
+formula <- ter_pressure_shap ~ ter_pressure + ter_pressure2
+ter_pressure <- lm(formula, dataset_X2shap)
+summary(ter_pressure)
+
+dataset_X2shap$NDVI2 <- dataset_X2shap$NDVI *dataset_X2shap$NDVI
+formula <- NDVI_shap ~ NDVI + NDVI2
+NDVI <- lm(formula, dataset_X2shap)
+summary(NDVI)
+
+dataset_X2shap$humidity2 <- dataset_X2shap$humidity *dataset_X2shap$humidity
+formula <- humidity_shap ~ humidity + humidity2
+humidity <- lm(formula, dataset_X2shap)
+summary(humidity)
+
+dataset_X2shap$precipitation2 <- dataset_X2shap$precipitation *dataset_X2shap$precipitation
+formula <- precipitation_shap ~ precipitation + precipitation2
+precipitation <- lm(formula, dataset_X2shap)
+summary(precipitation)
+
+dataset_X2shap$speedwind2 <- dataset_X2shap$speedwind *dataset_X2shap$speedwind
+formula <- speedwind_shap ~ speedwind + speedwind2
+speedwind <- lm(formula, dataset_X2shap)
+summary(speedwind)
+
+dataset_X2shap$mg_m2_troposphere_no2.2 <- dataset_X2shap$mg_m2_troposphere_no2 *dataset_X2shap$mg_m2_troposphere_no2
+formula <- mg_m2_troposphere_no2_shap ~ mg_m2_troposphere_no2 + mg_m2_troposphere_no2.2
+mg_m2_troposphere_no2 <- lm(formula, dataset_X2shap)
+summary(mg_m2_troposphere_no2)
+
+dataset_X2shap$ozone2 <- dataset_X2shap$ozone *dataset_X2shap$ozone
+formula <- ozone_shap ~ ozone + ozone2
+ozone <- lm(formula, dataset_X2shap)
+summary(ozone)
+
+dataset_X2shap$UVAerosolIndex2 <- dataset_X2shap$UVAerosolIndex *dataset_X2shap$UVAerosolIndex
+formula <- UVAerosolIndex_shap ~ UVAerosolIndex + UVAerosolIndex2
+UVAerosolIndex <- lm(formula, dataset_X2shap)
+summary(UVAerosolIndex)
+
+dataset_X2shap$PBLH2 <- dataset_X2shap$PBLH *dataset_X2shap$PBLH
+formula <- PBLH_shap ~ PBLH + PBLH2
+PBLH <- lm(formula, dataset_X2shap)
+summary(PBLH)
+
+point_dataset <- dataset_Xshap[,c(1,19,20)] %>% distinct()
+xy <- point_dataset[,c(2,3)]
+points_mesh <- SpatialPointsDataFrame(coords = xy, data = point_dataset,
+                                      proj4string = CRS(proj))
+points_mesh@data <- points_mesh@data %>% dplyr::select(GridID)
+
+formula <- Temperature_shap ~ Temperature + Temperature2
+GWPR.FEM.bandwidth.Temperature <- # this is about fixed bandwidth
+  bw.GWPR(formula = formula, data = dataset_X2shap, index = c("GridID", "time"),
+          SDF = points_mesh, adaptive = F, p = 2, bigdata = F,
+          upperratio = 0.10, effect = "individual", model = "pooling", approach = "CV",
+          kernel = "bisquare",doParallel = T, cluster.number = 8, gradientIncrement = T,
+          GI.step = 0.0025, GI.upper = 0.061, GI.lower = 0.0025)
+
+
+
 
 
 
