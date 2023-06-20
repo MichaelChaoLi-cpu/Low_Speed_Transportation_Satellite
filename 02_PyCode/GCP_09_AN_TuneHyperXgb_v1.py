@@ -9,7 +9,6 @@ for GCP
 
 import pandas as pd
 import pyreadr
-from shap import TreeExplainer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import xgboost as xgb
@@ -37,13 +36,32 @@ def getXandStanY():
     df = pd.concat([X, merge_y], axis=1)
     return df, X, y_output
 
+def getXandStanYnoah():
+    df = pd.read_csv(REPO_LOCATION + "98_DatasetWithNoah.csv", index_col=0)
+    df.set_index(['GridID', 'time'], inplace=True)
+    df.dropna(inplace=True)
+    df_output = df.copy()
+    aim_variable_list = ['lowSpeedDensity',  
+                         'tair', 'psurf', 'qair', 'wind', 'rainf',
+                         'NTL', 'NDVI', 
+                         'mg_m2_troposphere_no2', 'ozone',
+                         'UVAerosolIndex', 'PBLH']
+    for variable_name in aim_variable_list:
+        df_output[variable_name] = df_output.groupby('GridID')[variable_name].transform(lambda x: (x - x.mean()) / x.std())
+    
+    X = df_output.iloc[:,1:df.shape[1]].copy()
+    y = df_output.iloc[:,0:1].copy()
+
+    return df_output, X, y
+
 def tuningHyperNestimator(X, y, n_estimators_list):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
                                                         random_state=42)
     best_score = 0
     best_parameter = 0
     for n_estimators in n_estimators_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1)
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, 
+                                         tree_method='gpu_hist',)
         xgb_regressor.fit(X_train, y_train)
         y_pred = xgb_regressor.predict(X_test)
         accuracy = r2_score(y_test, y_pred)
@@ -59,7 +77,8 @@ def tuningHyperLr(X, y, n_estimators, learning_rate_list):
     best_score = 0
     best_parameter = 0
     for interest in learning_rate_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, 
+                                         tree_method='gpu_hist',
                                          learning_rate = interest)
         xgb_regressor.fit(X_train, y_train)
         y_pred = xgb_regressor.predict(X_test)
@@ -77,7 +96,8 @@ def tuningHyperMaxDepth(X, y, n_estimators, learning_rate,
     best_score = 0
     best_parameter = 0
     for interest in tuning_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, 
+                                         tree_method='gpu_hist',
                                          learning_rate = learning_rate, 
                                          max_depth = interest)
         xgb_regressor.fit(X_train, y_train)
@@ -96,7 +116,8 @@ def tuningHyperChild(X, y, n_estimators, learning_rate, max_depth,
     best_score = 0
     best_parameter = 0
     for interest in tuning_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, 
+                                         tree_method='gpu_hist',
                                          learning_rate = learning_rate, 
                                          max_depth = max_depth,
                                          min_child_weight = interest)
@@ -116,7 +137,8 @@ def tuningHyperGamma(X, y, n_estimators, learning_rate, max_depth, min_child_wei
     best_score = 0
     best_parameter = 0
     for interest in tuning_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, 
+                                         tree_method='gpu_hist',
                                          learning_rate = learning_rate, 
                                          max_depth = max_depth, 
                                          min_child_weight = min_child_weight,
@@ -138,7 +160,8 @@ def tuningHyperSubsample(X, y, n_estimators, learning_rate,
     best_score = 0
     best_parameter = 0
     for interest in tuning_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, 
+                                         tree_method='gpu_hist',
                                          learning_rate = learning_rate, 
                                          max_depth = max_depth, 
                                          min_child_weight = min_child_weight,
@@ -162,7 +185,8 @@ def tuningHypercolsample_bytree(X, y, n_estimators, learning_rate,
     best_score = 0
     best_parameter = 0
     for interest in tuning_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators,
+                                         tree_method='gpu_hist',
                                          learning_rate = learning_rate, 
                                          max_depth = max_depth, 
                                          min_child_weight = min_child_weight,
@@ -186,7 +210,8 @@ def tuningHyperreg_alpha(X, y, n_estimators, learning_rate,
     best_score = 0
     best_parameter = 0
     for interest in tuning_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, 
+                                         tree_method='gpu_hist',
                                          learning_rate = learning_rate, 
                                          max_depth = max_depth, 
                                          min_child_weight = min_child_weight,
@@ -211,7 +236,8 @@ def tuningHyperreg_lambda(X, y, n_estimators, learning_rate,
     best_score = 0
     best_parameter = 0
     for interest in tuning_list:
-        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, n_jobs=-1,
+        xgb_regressor = xgb.XGBRegressor(n_estimators = n_estimators, 
+                                         tree_method='gpu_hist',
                                          learning_rate = learning_rate, 
                                          max_depth = max_depth, 
                                          min_child_weight = min_child_weight,
@@ -243,10 +269,10 @@ def testBestModel(X, y, *args, **kwargs):
     print(f"ALL; Accuracy: {accuracy*100:.2f}%")
     return None
 
-REPO_LOCATION = "/home/gcp_cpu/DP11/"
+REPO_LOCATION = "/home/a100gpu3/DP11/"
 REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
 
-df, X, y = getXandStanY()
+df, X, y = getXandStanYnoah()
 best_score, best_n_estimators = tuningHyperNestimator(X, y, 
                                                       [100, 200, 300, 400, 500,
                                                        600, 700, 800, 900, 1000,
@@ -256,44 +282,55 @@ best_score, best_n_estimators = tuningHyperNestimator(X, y,
                                                        2300, 2400, 2500, 2600,
                                                        2700, 2800, 2900, 3000])
 ### n_estimators = 3000
-best_score, best_lr = tuningHyperLr(X, y, 3000, 
-                                    [0.01, 0.05, 0.1, 0.2, 0.5, 0.6, 0.8])
+best_score, best_lr = tuningHyperLr(X, y, best_n_estimators, 
+                                    [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 
+                                     0.5, 0.6, 0.7, 0.8])
 
-### learning_rate = 0.5
-best_score, best_maxdepth = tuningHyperMaxDepth(X, y, 3000, 0.5,
+### learning_rate = 0.3
+best_score, best_maxdepth = tuningHyperMaxDepth(X, y, best_n_estimators, best_lr,
                                                 [3, 4, 5, 6, 7, 8, 9, 10,
                                                  11, 12, 13, 14, 15])
-### max_depth = 11
-best_score, best_child = tuningHyperChild(X, y, 3000, 0.5, 11, 
+### max_depth = 12
+best_score, best_child = tuningHyperChild(X, y, best_n_estimators, best_lr, 
+                                          best_maxdepth, 
                                           [1, 2, 3, 4, 5, 
                                            6, 7, 8, 9, 10])
 ### min_child_weight=1
-best_score, best_gamma = tuningHyperGamma(X, y, 3000, 0.5, 11, 1,
+best_score, best_gamma = tuningHyperGamma(X, y, best_n_estimators, best_lr,
+                                          best_maxdepth, best_child,
                                              [0, 1, 2, 3, 4, 5])
 ### gamma = 0
-best_score, best_Subsample = tuningHyperSubsample(X, y, 3000, 0.5, 11, 1,
-                                                  0, 
+best_score, best_Subsample = tuningHyperSubsample(X, y, best_n_estimators, best_lr,
+                                                  best_maxdepth, best_child,
+                                                  best_gamma, 
                                                   [0.5, 0.6, 0.7, 0.8, 0.9, 1])
 ### subsample = 1
-best_score, best_colsample_bytree = tuningHypercolsample_bytree(X, y, 3000, 0.5, 11, 1,
-                                                                0, 1,
+best_score, best_colsample_bytree = tuningHypercolsample_bytree(X, y, best_n_estimators, best_lr,
+                                                                best_maxdepth, best_child,
+                                                                best_gamma, best_Subsample,
                                                                 [0.1, 0.2, 0.3, 0.4, 0.5,
                                                                  0.6, 0.7, 0.8, 0.9, 1])
-### colsample_bytree = 0.4
-best_score, best_reg_alpha = tuningHyperreg_alpha(X, y, 3000, 0.5, 11, 1,
-                                                  0, 1, 0.4,
+### colsample_bytree = 0.8
+best_score, best_reg_alpha = tuningHyperreg_alpha(X, y, best_n_estimators, best_lr, 
+                                                  best_maxdepth, best_child,
+                                                  best_gamma, best_Subsample,
+                                                  best_colsample_bytree,
                                                   [0, 0.1, 0.2, 0.3, 0.4, 0.5,
                                                    0.6, 0.7, 0.8, 0.9, 1])
-### reg_alpha = 1
-best_score, best_reg_lambda = tuningHyperreg_lambda(X, y, 3000, 0.5, 11, 1,
-                                                    0, 1, 0.4, 1,
+### reg_alpha = 0.5
+best_score, best_reg_lambda = tuningHyperreg_lambda(X, y, best_n_estimators, best_lr, 
+                                                    best_maxdepth, best_child,
+                                                    best_gamma, best_Subsample, 
+                                                    best_colsample_bytree, best_reg_alpha,
                                                     [0, 0.1, 0.2, 0.3, 0.4, 0.5,
                                                      0.6, 0.7, 0.8, 0.9, 1])
 ### reg_lambda = 0.11
 
-testBestModel(X, y, n_jobs=-1, n_estimators = 3000, learning_rate = 0.5,
-              max_depth = 11, min_child_weight = 1, gamma = 0, 
-              subsample = 1, colsample_bytree = 0.4, reg_alpha = 1,
-              reg_lambda = 1)
+testBestModel(X, y, tree_method='gpu_hist', 
+              n_estimators = best_n_estimators, learning_rate = best_lr,
+              max_depth = best_maxdepth, min_child_weight = best_child, 
+              gamma = best_gamma, subsample = best_Subsample, 
+              colsample_bytree = best_colsample_bytree, reg_alpha = best_reg_alpha,
+              reg_lambda = best_reg_lambda)
 
 

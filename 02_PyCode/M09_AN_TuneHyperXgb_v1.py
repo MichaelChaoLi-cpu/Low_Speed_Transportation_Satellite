@@ -21,6 +21,8 @@ def runLocallyOrRemotely(Locally_Or_Remotely):
         repo_location = "/mnt/d/OneDrive - Kyushu University/11_Article/03_RStudio/"
     elif  locally_or_remotely == 'linux':
         repo_location = "/mnt/d/OneDrive - Kyushu University/11_Article/03_RStudio/"
+    elif  locally_or_remotely == 'mac':
+        repo_location = "/Users/lichao/Library/CloudStorage/OneDrive-KyushuUniversity/04_Article/SafetyFeelingAndNTL/"
     return repo_location
 
 def getXandStanY():

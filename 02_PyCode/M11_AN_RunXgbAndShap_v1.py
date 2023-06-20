@@ -6,6 +6,7 @@ Created on Wed Apr 26 11:28:48 2023
 """
 
 from joblib import dump
+import numpy as np
 import os
 import pandas as pd
 import pyreadr
@@ -24,6 +25,8 @@ def runLocallyOrRemotely(Locally_Or_Remotely):
         repo_location = "/mnt/d/OneDrive - Kyushu University/11_Article/03_RStudio/"
     elif  locally_or_remotely == 'gcp':
         repo_location =  os.path.join(os.getcwd(), 'DP11/')
+    elif locally_or_remotely == 'mac':
+        repo_location = "/Users/lichao/Library/CloudStorage/OneDrive-KyushuUniversity/11_Article/03_RStudio/"
     return repo_location
 
 def getXandYinFirstDifference():
@@ -87,6 +90,32 @@ def getXandStanY():
 
     return df_output, X, y
 
+def makeNewDatasetToAnalysis():
+    df = pd.read_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv')
+    #df.set_index(['GridID', 'time'], inplace=True)
+    df = df[['GridID', 'time', 
+             'lowSpeedDensity', 'NTL', 'NDVI', 
+             'mg_m2_troposphere_no2', 'ozone',
+             'UVAerosolIndex', 'PBLH', 
+             'prevalance', 'mortality',
+             'emergence', 'year', 'month', 'x', 'y']]
+    new_control_df = pd.read_csv(REPO_DATA_LOCATION + 
+                                 "18_AdditionalControlVariFromNoah0.1.csv")
+    merged_df = pd.merge(df, new_control_df, on=['GridID', 'time'])
+    merged_df.set_index(['GridID', 'time'], inplace=True)
+    merged_df.to_csv(REPO_DATA_LOCATION + "98_DatasetWithNoah.csv")
+    return None
+    
+def getXandStanYnoah():
+    df = pd.read_csv(REPO_DATA_LOCATION + "98_DatasetWithNoah.csv", index_col=0)
+    df.set_index(['GridID', 'time'], inplace=True)
+    df.dropna(inplace=True)
+    X = df.iloc[:,1:df.shape[1]].copy()
+    y = df.iloc[:,0:1].copy()
+
+    return df, X, y
+    
+
 
 def getBestModel(X, y, *args, **kwargs):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
@@ -140,6 +169,7 @@ def makeDatasetWithShap(df, shap_value_input):
 
 REPO_LOCATION = runLocallyOrRemotely('y')
 REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
+REPO_DATA_LOCATION = REPO_LOCATION + '04_Data/'
 
 if __name__ == '__main__':
     #df, X, y = getXandYinFirstDifference()
@@ -155,18 +185,18 @@ if __name__ == '__main__':
     #dataset_to_analysis = makeDatasetWithShap(df, shap_value)
     #dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
     
-    df, X, y = getXandStanY()
+    df, X, y = getXandStanYnoah()
     model = getBestModel(X, y, tree_method='gpu_hist', n_estimators = 3000, learning_rate = 0.5,
                          max_depth = 12, min_child_weight = 1, gamma = 0, 
                          subsample = 1, colsample_bytree = 1, reg_alpha = 0.5,
                          reg_lambda = 1)
     shap_value = getShap(model, X)
     
-    dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference.joblib') 
+    dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference_noah.joblib') 
     shap_value = pd.DataFrame(shap_value)
     
     dataset_to_analysis = makeDatasetWithShap(df, shap_value)
-    dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP.csv') 
+    dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP_noah.csv') 
 
 
 """
