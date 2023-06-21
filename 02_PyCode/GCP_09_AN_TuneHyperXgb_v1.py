@@ -7,8 +7,10 @@ Created on Tue May 23 16:45:32 2023
 for GCP
 """
 
+from joblib import dump
 import pandas as pd
 import pyreadr
+from shap import TreeExplainer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import xgboost as xgb
@@ -262,12 +264,27 @@ def testBestModel(X, y, *args, **kwargs):
     y_pred = xgb_regressor.predict(X_test)
     accuracy = r2_score(y_test, y_pred)
     print(f"CV; Accuracy: {accuracy*100:.2f}%")
-    xgb_regressor = xgb.XGBRegressor()
+    xgb_regressor = xgb.XGBRegressor(**kwargs)
     xgb_regressor.fit(X, y)
     y_pred = xgb_regressor.predict(X)
     accuracy = r2_score(y, y_pred)    
     print(f"ALL; Accuracy: {accuracy*100:.2f}%")
-    return None
+    return xgb_regressor
+
+def getShap(model, X):
+    explainer = TreeExplainer(model)
+    shap_value = explainer.shap_values(X, check_additivity=False)
+    return shap_value
+
+def makeDatasetWithShap(df, shap_value_input):
+    shap_value = shap_value_input.copy()
+    index_df = df.reset_index()[['GridID', 'time']]
+    shap_value = pd.concat([index_df, shap_value], axis=1).set_index(['GridID', 'time'])
+    X_colname = df.columns[1:]
+    shap_colnames = X_colname + "_shap"
+    shap_value.columns = shap_colnames
+    dataset_to_analysis = pd.concat([df, shap_value], axis=1)
+    return dataset_to_analysis
 
 REPO_LOCATION = "/home/a100gpu3/DP11/"
 REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
@@ -289,13 +306,13 @@ best_score, best_lr = tuningHyperLr(X, y, best_n_estimators,
 ### learning_rate = 0.3
 best_score, best_maxdepth = tuningHyperMaxDepth(X, y, best_n_estimators, best_lr,
                                                 [3, 4, 5, 6, 7, 8, 9, 10,
-                                                 11, 12, 13, 14, 15])
-### max_depth = 12
+                                                 11, 12, 13, 14, 15, 16, 17, 18])
+### max_depth = 18
 best_score, best_child = tuningHyperChild(X, y, best_n_estimators, best_lr, 
                                           best_maxdepth, 
                                           [1, 2, 3, 4, 5, 
                                            6, 7, 8, 9, 10])
-### min_child_weight=1
+### min_child_weight=2
 best_score, best_gamma = tuningHyperGamma(X, y, best_n_estimators, best_lr,
                                           best_maxdepth, best_child,
                                              [0, 1, 2, 3, 4, 5])
@@ -310,7 +327,7 @@ best_score, best_colsample_bytree = tuningHypercolsample_bytree(X, y, best_n_est
                                                                 best_gamma, best_Subsample,
                                                                 [0.1, 0.2, 0.3, 0.4, 0.5,
                                                                  0.6, 0.7, 0.8, 0.9, 1])
-### colsample_bytree = 0.8
+### colsample_bytree = 0.5
 best_score, best_reg_alpha = tuningHyperreg_alpha(X, y, best_n_estimators, best_lr, 
                                                   best_maxdepth, best_child,
                                                   best_gamma, best_Subsample,
@@ -324,13 +341,19 @@ best_score, best_reg_lambda = tuningHyperreg_lambda(X, y, best_n_estimators, bes
                                                     best_colsample_bytree, best_reg_alpha,
                                                     [0, 0.1, 0.2, 0.3, 0.4, 0.5,
                                                      0.6, 0.7, 0.8, 0.9, 1])
-### reg_lambda = 0.11
+### reg_lambda = 1
 
-testBestModel(X, y, tree_method='gpu_hist', 
-              n_estimators = best_n_estimators, learning_rate = best_lr,
-              max_depth = best_maxdepth, min_child_weight = best_child, 
-              gamma = best_gamma, subsample = best_Subsample, 
-              colsample_bytree = best_colsample_bytree, reg_alpha = best_reg_alpha,
-              reg_lambda = best_reg_lambda)
+model = testBestModel(X, y, tree_method='gpu_hist', 
+                      n_estimators = best_n_estimators, learning_rate = best_lr,
+                      max_depth = best_maxdepth, min_child_weight = best_child, 
+                      gamma = best_gamma, subsample = best_Subsample, 
+                      colsample_bytree = best_colsample_bytree, reg_alpha = best_reg_alpha,
+                      reg_lambda = best_reg_lambda)
 
+shap_value = getShap(model, X)
 
+dump(shap_value, REPO_RESULT_LOCATION + '03_TreeShapFirstDifference_noah.joblib') 
+shap_value = pd.DataFrame(shap_value)
+
+dataset_to_analysis = makeDatasetWithShap(df, shap_value)
+dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP_noah.csv') 

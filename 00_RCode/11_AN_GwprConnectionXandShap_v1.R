@@ -10,7 +10,7 @@ library(plm)
 library(sp)
 
 proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
-dataset_Xshap <- read.csv('03_Results/mergedXSHAP.csv')
+dataset_Xshap <- read.csv('03_Results/mergedXSHAP_noah.csv')
 
 
 #### build sp dataset
@@ -21,8 +21,8 @@ points_mesh <- SpatialPointsDataFrame(coords = xy, data = point_dataset,
 points_mesh@data <- points_mesh@data %>% dplyr::select(GridID)
 
 correlation_table <- cor(dataset_Xshap)
-### Temperature 
-formula <- Temperature_shap ~ Temperature
+### Temperature 0.03
+formula <- tair_shap ~ tair
 
 GWPR.FEM.bandwidth.Temperature <- # this is about fixed bandwidth
   bw.GWPR(formula = formula, data = dataset_Xshap, index = c("GridID", "time"),
@@ -74,18 +74,18 @@ GWPR.FEM.CV.F.result.NDVI <- GWPR(formula = formula, data = dataset_Xshap, index
                                  model = "random")
 saveRDS(GWPR.FEM.CV.F.result.NDVI, '03_Results/GWPR.FEM.CV.F.result.NDVI.rds')
 
-formula <- ter_pressure_shap ~ ter_pressure
+formula <- psurf_shap ~ psurf #r2 0.57
 
 GWPR.FEM.bandwidth.ter_pressure <- # this is about fixed bandwidth
   bw.GWPR(formula = formula, data = dataset_Xshap, index = c("GridID", "time"),
           SDF = points_mesh, adaptive = F, p = 2, bigdata = F,
-          upperratio = 0.10, effect = "individual", model = "within", approach = "CV",
+          upperratio = 0.10, effect = "individual", model = "pooling", approach = "CV",
           kernel = "bisquare",doParallel = T, cluster.number = 8, gradientIncrement = T,
           GI.step = 0.0025, GI.upper = 0.061, GI.lower = 0.0025)
 saveRDS(GWPR.FEM.bandwidth.ter_pressure, '03_Results/GWPR.FEM.bandwidth.ter_pressure.rds')
 plot(GWPR.FEM.bandwidth.ter_pressure[,1], GWPR.FEM.bandwidth.ter_pressure[,2])
 
-formula <- humidity_shap ~ humidity
+formula <- qair_shap ~ qair
 
 GWPR.FEM.bandwidth.humidity <- # this is about fixed bandwidth
   bw.GWPR(formula = formula, data = dataset_Xshap, index = c("GridID", "time"),
@@ -96,7 +96,7 @@ GWPR.FEM.bandwidth.humidity <- # this is about fixed bandwidth
 saveRDS(GWPR.FEM.bandwidth.humidity, '03_Results/GWPR.FEM.bandwidth.humidity.rds')
 plot(GWPR.FEM.bandwidth.humidity[,1], GWPR.FEM.bandwidth.humidity[,2])
 
-formula <- precipitation_shap ~ precipitation
+formula <- rainf_shap ~ rainf
 
 GWPR.FEM.bandwidth.precipitation <- # this is about fixed bandwidth
   bw.GWPR(formula = formula, data = dataset_Xshap, index = c("GridID", "time"),
@@ -107,7 +107,7 @@ GWPR.FEM.bandwidth.precipitation <- # this is about fixed bandwidth
 saveRDS(GWPR.FEM.bandwidth.precipitation, '03_Results/GWPR.FEM.bandwidth.precipitation.rds')
 plot(GWPR.FEM.bandwidth.precipitation[,1], GWPR.FEM.bandwidth.precipitation[,2])
 
-formula <- speedwind_shap ~ speedwind
+formula <- wind_shap ~ wind
 
 GWPR.FEM.bandwidth.speedwind <- # this is about fixed bandwidth
   bw.GWPR(formula = formula, data = dataset_Xshap, index = c("GridID", "time"),
@@ -152,19 +152,19 @@ plm_test <- function(formula){
   print(plmtest(ols, type = "bp"))
 }
 
-formula <- Temperature_shap ~ Temperature
+formula <- tair_shap ~ tair
 plm_test(formula)
 formula <- NTL_shap ~ NTL
 plm_test(formula)
-formula <- ter_pressure_shap ~ ter_pressure
+formula <- psurf_shap ~ psurf
 plm_test(formula)
 formula <- NDVI_shap ~ NDVI
 plm_test(formula)
-formula <- humidity_shap ~ humidity
+formula <- qair_shap ~ qair
 plm_test(formula)
-formula <- precipitation_shap ~ precipitation
+formula <- rainf_shap ~ rainf
 plm_test(formula)
-formula <- speedwind_shap ~ speedwind
+formula <- wind_shap ~ wind
 plm_test(formula)
 formula <- mg_m2_troposphere_no2_shap ~ mg_m2_troposphere_no2
 plm_test(formula)
@@ -177,8 +177,8 @@ plm_test(formula)
 
 #### second order test
 dataset_X2shap <- dataset_Xshap
-dataset_X2shap$Temperature2 <- dataset_X2shap$Temperature*dataset_X2shap$Temperature
-formula <- Temperature_shap ~ Temperature + Temperature2
+dataset_X2shap$tair2 <- dataset_X2shap$tair*dataset_X2shap$tair
+formula <- tair_shap ~ tair + tair2
 temp <- lm(formula, dataset_X2shap)
 summary(temp)
 
@@ -187,8 +187,8 @@ formula <- NTL_shap ~ NTL + NTL2
 NTL <- lm(formula, dataset_X2shap)
 summary(NTL)
 
-dataset_X2shap$ter_pressure2 <- dataset_X2shap$ter_pressure *dataset_X2shap$ter_pressure
-formula <- ter_pressure_shap ~ ter_pressure + ter_pressure2
+dataset_X2shap$psurf2 <- dataset_X2shap$psurf *dataset_X2shap$psurf
+formula <- psurf_shap ~ psurf + psurf2
 ter_pressure <- lm(formula, dataset_X2shap)
 summary(ter_pressure)
 
@@ -197,18 +197,18 @@ formula <- NDVI_shap ~ NDVI + NDVI2
 NDVI <- lm(formula, dataset_X2shap)
 summary(NDVI)
 
-dataset_X2shap$humidity2 <- dataset_X2shap$humidity *dataset_X2shap$humidity
+dataset_X2shap$qair2 <- dataset_X2shap$qair *dataset_X2shap$qair
 formula <- humidity_shap ~ humidity + humidity2
 humidity <- lm(formula, dataset_X2shap)
 summary(humidity)
 
 dataset_X2shap$precipitation2 <- dataset_X2shap$precipitation *dataset_X2shap$precipitation
-formula <- precipitation_shap ~ precipitation + precipitation2
+formula <- qair_shap ~ qair + qair2
 precipitation <- lm(formula, dataset_X2shap)
 summary(precipitation)
 
-dataset_X2shap$speedwind2 <- dataset_X2shap$speedwind *dataset_X2shap$speedwind
-formula <- speedwind_shap ~ speedwind + speedwind2
+dataset_X2shap$wind2 <- dataset_X2shap$wind *dataset_X2shap$wind
+formula <- wind_shap ~ wind + wind2
 speedwind <- lm(formula, dataset_X2shap)
 summary(speedwind)
 
