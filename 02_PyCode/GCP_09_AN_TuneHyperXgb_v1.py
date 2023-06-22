@@ -8,6 +8,7 @@ for GCP
 """
 
 from joblib import dump
+import os
 import pandas as pd
 import pyreadr
 from shap import TreeExplainer
@@ -41,12 +42,12 @@ def getXandStanY():
 def getXandStanYnoah():
     df = pd.read_csv(REPO_LOCATION + "98_DatasetWithNoah.csv", index_col=0)
     df.set_index(['GridID', 'time'], inplace=True)
+    df = df.drop(columns=['year', 'month'])
     df.dropna(inplace=True)
     df_output = df.copy()
     aim_variable_list = ['lowSpeedDensity',  
                          'tair', 'psurf', 'qair', 'wind', 'rainf',
                          'NTL', 'NDVI', 
-                         'mg_m2_troposphere_no2', 'ozone',
                          'UVAerosolIndex', 'PBLH']
     for variable_name in aim_variable_list:
         df_output[variable_name] = df_output.groupby('GridID')[variable_name].transform(lambda x: (x - x.mean()) / x.std())
@@ -286,7 +287,7 @@ def makeDatasetWithShap(df, shap_value_input):
     dataset_to_analysis = pd.concat([df, shap_value], axis=1)
     return dataset_to_analysis
 
-REPO_LOCATION = "/home/a100gpu3/DP11/"
+REPO_LOCATION = os.getcwd() + '/'
 REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
 
 df, X, y = getXandStanYnoah()
@@ -306,7 +307,9 @@ best_score, best_lr = tuningHyperLr(X, y, best_n_estimators,
 ### learning_rate = 0.3
 best_score, best_maxdepth = tuningHyperMaxDepth(X, y, best_n_estimators, best_lr,
                                                 [3, 4, 5, 6, 7, 8, 9, 10,
-                                                 11, 12, 13, 14, 15, 16, 17, 18])
+                                                 11, 12, 13, 14, 15, 16, 17,
+                                                 18, 19, 20, 21, 22, 23, 24,
+                                                 25])
 ### max_depth = 18
 best_score, best_child = tuningHyperChild(X, y, best_n_estimators, best_lr, 
                                           best_maxdepth, 
