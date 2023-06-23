@@ -47,7 +47,7 @@ def getXandStanYnoah():
     df_output = df.copy()
     aim_variable_list = ['lowSpeedDensity',  
                          'tair', 'psurf', 'qair', 'wind', 'rainf',
-                         'NTL', 'NDVI', 
+                         'NTL', 'NDVI',  'ozone', 'mg_m2_troposphere_no2', 
                          'UVAerosolIndex', 'PBLH']
     for variable_name in aim_variable_list:
         df_output[variable_name] = df_output.groupby('GridID')[variable_name].transform(lambda x: (x - x.mean()) / x.std())
@@ -360,3 +360,32 @@ shap_value = pd.DataFrame(shap_value)
 
 dataset_to_analysis = makeDatasetWithShap(df, shap_value)
 dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP_noah.csv') 
+
+
+
+
+"""
+print(best_n_estimators, best_lr, best_maxdepth, best_child, best_gamma, best_Subsample, best_colsample_bytree, best_reg_alpha, best_reg_lambda)
+3000 0.4 16 1 0 1 0.8 0.6 1
+
+
+"""
+
+
+"""
+2
+df = df.drop(columns=['year', 'month'])
+best_n_estimators=3000
+best_lr =0.3
+best_maxdepth=16
+best_child=2
+best_gamma=0
+best_Subsample=1
+best_colsample_bytree=0.8 
+best_reg_alpha=0.2
+best_reg_lambda=1
+"""
+
+
+
+

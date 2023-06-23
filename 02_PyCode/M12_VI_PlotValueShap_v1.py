@@ -22,17 +22,24 @@ def plotValueShap(Dataset_Shap_Df):
     #variable_of_interest = list(Dataset_Shap_Df.columns[1:19])
     
     X_colname = ['tair', 'psurf', 'qair', 'wind', 'rainf', 
-                 'NTL', 'NDVI', 'mg_m2_troposphere_no2', 
-                 'ozone', 'UVAerosolIndex', 'PBLH', 
+                 'NTL', 'NDVI', 
+                 #'mg_m2_troposphere_no2', 'ozone', 
+                 'UVAerosolIndex', 'PBLH', 
                  'prevalance', 'mortality', 'emergence', 
-                 'year', 'month', 'x', 'y'
+                 #'year', 'month', 
+                 'x', 'y'
                  ]
     sub_order = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                 'l', 'm', 'n', 'o', 'p', 'q', 'r']
+                 'l', 'm', 'n'
+                 #, 'o', 'p'
+                 #, 'q', 'r'
+                 ]
     feature_name = ["Temperature", "Air Pressure", "Humidity", "Wind Speed", 
-                    "Precipitation", "NTL", "NDVI", "NO2", 
-                    "Ozone", "UV Index", "PBLH", "Prevalence",
-                    "Mortality", "Emergence", "Year", "Month", 
+                    "Precipitation", "NTL", "NDVI", 
+                    #"NO2", "Ozone",
+                    "UV Index", "PBLH", "Prevalence",
+                    "Mortality", "Emergence", 
+                    #"Year", "Month", 
                     "Longitude", "Latitude"]
     fig, axs = plt.subplots(nrows=6, ncols=3, figsize=(21, 29.7), dpi=300)
     for i, variable_name in enumerate(X_colname):
