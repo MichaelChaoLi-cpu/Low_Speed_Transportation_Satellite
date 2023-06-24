@@ -60,6 +60,53 @@ def plotValueShap(Dataset_Shap_Df):
     fig.savefig(REPO_FIGURE_LOCATION + "All_SHAP.jpg", bbox_inches='tight')
     return None
 
+def getShapDf1():
+    dataset_to_analysis = pd.read_csv(REPO_RESULT_LOCATION + 'mergedXSHAP_noah1.csv')
+    dataset_to_analysis = dataset_to_analysis.set_index(['GridID', 'time'])
+    return dataset_to_analysis
+
+
+def plotValueShap1(Dataset_Shap_Df):
+    #variable_of_interest = list(Dataset_Shap_Df.columns[1:19])
+    
+    X_colname = ['tair', 'psurf', 'qair', 'wind', 'rainf', 
+                 'NTL', 'NDVI', 
+                 'mg_m2_troposphere_no2', 'ozone', 
+                 'UVAerosolIndex', 'PBLH', 
+                 'prevalance', 'mortality', 'emergence', 
+                 #'year', 'month', 
+                 'x', 'y'
+                 ]
+    sub_order = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+                 'l', 'm', 'n', 'o', 'p'
+                 #, 'q', 'r'
+                 ]
+    feature_name = ["Temperature", "Air Pressure", "Humidity", "Wind Speed", 
+                    "Precipitation", "NTL", "NDVI", 
+                    "NO2", "Ozone",
+                    "UV Index", "PBLH", "Prevalence",
+                    "Mortality", "Emergence", 
+                    #"Year", "Month", 
+                    "Longitude", "Latitude"]
+    fig, axs = plt.subplots(nrows=6, ncols=3, figsize=(21, 29.7), dpi=300)
+    for i, variable_name in enumerate(X_colname):
+        i_row, i_col = i//3, i%3
+        text_x = np.min(Dataset_Shap_Df[variable_name]) + 0.01 * (np.max(Dataset_Shap_Df[variable_name])-np.min(Dataset_Shap_Df[variable_name]))
+        text_y = np.max(Dataset_Shap_Df[variable_name+'_shap']) - 0.03 * (np.max(Dataset_Shap_Df[variable_name+'_shap'])-np.min(Dataset_Shap_Df[variable_name+'_shap']))
+        axs[i_row, i_col].scatter(Dataset_Shap_Df[variable_name], 
+                                  Dataset_Shap_Df[variable_name+'_shap'], alpha=0.05,
+                                  marker = '.', linewidths=0)
+        axs[i_row, i_col].grid(True)
+        if variable_name == 'year':
+            axs[i_row, i_col].text(2019, 0.18, sub_order[i], fontsize=20, weight='bold', color='r')
+        else:
+            axs[i_row, i_col].text(text_x, text_y, sub_order[i], fontsize=20, weight='bold', color='r')
+        axs[i_row, i_col].set_xlabel(feature_name[i], fontsize=15)
+        axs[i_row, i_col].set_ylabel(feature_name[i] + ' SHAP', fontsize=15)
+    plt.show(); 
+    fig.savefig(REPO_FIGURE_LOCATION + "All_SHAP1.jpg", bbox_inches='tight')
+    return None
+
 def plotTempShapMonthly(Dataset_Shap_Df):
     months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
               'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
@@ -86,9 +133,14 @@ if __name__ == '__main__':
     REPO_LOCATION = runLocallyOrRemotely('mac')
     REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
     REPO_FIGURE_LOCATION = REPO_LOCATION + '01_Figure/'
-    Dataset_Shap_Df = getShapDf()
+    Dataset_Shap_Df = getShapDf() ### -> easy
     plotValueShap(Dataset_Shap_Df)
-    plotTempShapMonthly(Dataset_Shap_Df)
+    
+    Dataset_Shap_Df1 = getShapDf1()
+    plotValueShap1(Dataset_Shap_Df1)
+    
+    
+    #plotTempShapMonthly(Dataset_Shap_Df)
     
     
     

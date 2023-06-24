@@ -367,8 +367,10 @@ dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + 'mergedXSHAP_noah.csv')
 """
 print(best_n_estimators, best_lr, best_maxdepth, best_child, best_gamma, best_Subsample, best_colsample_bytree, best_reg_alpha, best_reg_lambda)
 3000 0.4 16 1 0 1 0.8 0.6 1
+### .csv
 
-
+3000 0.3 16 2 0 1 0.8 0.2 1
+### 1.csv
 """
 
 
