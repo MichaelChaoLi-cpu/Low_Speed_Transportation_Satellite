@@ -16,13 +16,13 @@ proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 dataset_Xshap <- read.csv('03_Results/03_mergedXSHAPStdize_noah_withoutAP.csv')
 
 formula <- lowSpeedDensity ~ tair +  psurf + qair + wind + rainf +
-  NTL + NDVI + UVAerosolIndex + PBLH + prevalance + 
+  NTL + NDVI + PBLH + prevalance + 
   mortality + emergence  
 
 reg <- lm(formula, dataset_Xshap)
 summary(reg)
 
-point_dataset <- dataset_Xshap[,c(1,11,12)] %>% distinct()
+point_dataset <- dataset_Xshap[,c(1,10,11)] %>% distinct()
 xy <- point_dataset[,c(2,3)]
 points_mesh <- SpatialPointsDataFrame(coords = xy, data = point_dataset,
                                       proj4string = CRS(proj))
@@ -57,13 +57,5 @@ tm_shape(GWPR.result.tair$SDF) +
 
 
 
-dataset_Xshap1 <- read.csv('03_Results/mergedXSHAP_noah1.csv')
-
-formula <- lowSpeedDensity ~ tair +  psurf + qair + wind + rainf +
-  NTL + NDVI + UVAerosolIndex + PBLH + mg_m2_troposphere_no2 + ozone + prevalance + 
-  mortality + emergence  
-
-reg1 <- lm(formula, dataset_Xshap1)
-summary(reg1)
 
 

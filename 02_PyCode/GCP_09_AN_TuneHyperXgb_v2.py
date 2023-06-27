@@ -44,23 +44,6 @@ def getXandStanYnoah():
 
     return df_output, X, y
 
-def getXandStanYnoah1():
-    df = pd.read_csv(REPO_LOCATION + "98_DatasetWithNoah.csv", index_col=0)
-    df.set_index(['GridID', 'time'], inplace=True)
-    df = df.drop(columns=['year', 'month'])
-    df.dropna(inplace=True)
-    df_output = df.copy()
-    aim_variable_list = ['lowSpeedDensity',  
-                         'tair', 'psurf', 'qair', 'wind', 'rainf',
-                         'NTL', 'NDVI', 'UVAerosolIndex', 'PBLH',
-                         'ozone', 'mg_m2_troposphere_no2']
-    for variable_name in aim_variable_list:
-        df_output[variable_name] = df_output.groupby('GridID')[variable_name].transform(lambda x: (x - x.mean()) / x.std())
-    
-    X = df_output.iloc[:,1:df.shape[1]].copy()
-    y = df_output.iloc[:,0:1].copy()
-
-    return df_output, X, y
 
 def getXandYdiff():
     df = pd.read_csv(REPO_LOCATION + "98_DatasetWithNoah.csv", index_col=0)
@@ -71,7 +54,7 @@ def getXandYdiff():
     df_raw = df_raw[[
         'time', 'lowSpeedDensity',  
         'tair', 'psurf', 'qair', 'wind', 'rainf',
-        'NTL', 'NDVI', 'UVAerosolIndex', 'PBLH',
+        'NTL', 'NDVI', 'PBLH',
         'prevalance', 'mortality', 'emergence'
         ]]
     df_diffencemerge = pd.DataFrame(columns=df_raw.columns)
@@ -99,7 +82,7 @@ def getXandYdiff():
     df_output = df.copy()
     aim_variable_list = ['lowSpeedDensity',  
                          'tair', 'psurf', 'qair', 'wind', 'rainf',
-                         'NTL', 'NDVI', 'UVAerosolIndex', 'PBLH']
+                         'NTL', 'NDVI', 'PBLH']
     for variable_name in aim_variable_list:
         df_output[variable_name] = df_output.groupby('GridID')[variable_name].transform(lambda x: (x - x.mean()) / x.std())
     
@@ -454,96 +437,6 @@ if __name__ == '__main__':
         dataset_to_analysis = makeDatasetWithShap(df, shap_value)
         dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + '03_mergedXSHAPStdize_noah_withoutAP.csv')
         
-        
-        #### with the ozone no2
-        
-        df, X, y = getXandStanYnoah1()
-        
-        print(X.columns)
-        
-        best_score, best_n_estimators, \
-            tuning_n_estimator = tuningHyperNestimator(X, y, 
-                                                        [100, 200, 300, 400, 500,
-                                                         600, 700, 800, 900, 1000,
-                                                         1100, 1200, 1300, 1400,
-                                                         1500, 1600, 1700, 1800,
-                                                         1900, 2000, 2100, 2200, 
-                                                         2300, 2400, 2500, 2600,
-                                                         2700, 2800, 2900, 3000])
-        ### n_estimators = 3000
-        best_score, best_lr, \
-            tuning_lr = tuningHyperLr(X, y, best_n_estimators, 
-                                      [0.01, 0.05, 0.1, 
-                                       0.2, 0.3, 0.4, 
-                                       0.5, 0.6, 0.7, 0.8])
-        
-        ### learning_rate = 0.3
-        best_score, best_maxdepth, \
-            tuning_maxdepth = tuningHyperMaxDepth(X, y, best_n_estimators, best_lr,
-                                                  [3, 4, 5, 6, 7, 8, 9, 10,
-                                                   11, 12, 13, 14, 15, 16, 17,
-                                                   18, 19, 20, 21, 22, 23, 24,
-                                                   25])
-        ### max_depth = 18
-        best_score, best_child, \
-            tuning_child = tuningHyperChild(X, y, best_n_estimators, best_lr, 
-                                            best_maxdepth, 
-                                            [1, 2, 3, 4, 5, 
-                                             6, 7, 8, 9, 10])
-        ### min_child_weight=2
-        best_score, best_gamma, \
-            tuning_gamma = tuningHyperGamma(X, y, best_n_estimators, best_lr,
-                                            best_maxdepth, best_child,
-                                            [0, 1, 2, 3, 4, 5])
-        ### gamma = 0
-        best_score, best_Subsample, \
-            tuning_Subsample = tuningHyperSubsample(X, y, best_n_estimators, best_lr,
-                                                    best_maxdepth, best_child,
-                                                    best_gamma, 
-                                                    [0.5, 0.6, 0.7, 0.8, 0.9, 1])
-        ### subsample = 1
-        best_score, best_colsample_bytree, \
-            tuning_bytree = tuningHypercolsample_bytree(X, y, best_n_estimators, best_lr,
-                                                        best_maxdepth, best_child,
-                                                        best_gamma, best_Subsample,
-                                                        [0.1, 0.2, 0.3, 0.4, 0.5,
-                                                         0.6, 0.7, 0.8, 0.9, 1])
-        ### colsample_bytree = 0.5
-        best_score, best_reg_alpha, \
-            tuning_reg_alpha = tuningHyperreg_alpha(X, y, best_n_estimators, best_lr, 
-                                                    best_maxdepth, best_child,
-                                                    best_gamma, best_Subsample,
-                                                    best_colsample_bytree,
-                                                    [0, 0.1, 0.2, 0.3, 0.4, 0.5,
-                                                     0.6, 0.7, 0.8, 0.9, 1])
-        ### reg_alpha = 0.5
-        best_score, best_reg_lambda, \
-            tuning_reg_lambda = tuningHyperreg_lambda(X, y, best_n_estimators, best_lr, 
-                                                      best_maxdepth, best_child,
-                                                      best_gamma, best_Subsample, 
-                                                      best_colsample_bytree, best_reg_alpha,
-                                                      [0, 0.1, 0.2, 0.3, 0.4, 0.5,
-                                                       0.6, 0.7, 0.8, 0.9, 1])
-        ### reg_lambda = 1
-        tuning_records = [tuning_n_estimator, tuning_lr, tuning_maxdepth, 
-                          tuning_child, tuning_gamma, tuning_Subsample,
-                          tuning_bytree, tuning_reg_alpha, tuning_reg_lambda]
-        dump(tuning_records, REPO_RESULT_LOCATION + '04_tuninglist_noah_withAP.joblib')
-        
-        model = testBestModel(X, y, tree_method='gpu_hist', 
-                              n_estimators = best_n_estimators, learning_rate = best_lr,
-                              max_depth = best_maxdepth, min_child_weight = best_child, 
-                              gamma = best_gamma, subsample = best_Subsample, 
-                              colsample_bytree = best_colsample_bytree, reg_alpha = best_reg_alpha,
-                              reg_lambda = best_reg_lambda)
-        
-        shap_value = getShap(model, X)
-        
-        dump(shap_value, REPO_RESULT_LOCATION + '04_TreeShapStdize_noah_withAP.joblib') 
-        shap_value = pd.DataFrame(shap_value)
-        
-        dataset_to_analysis = makeDatasetWithShap(df, shap_value)
-        dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + '04_mergedXSHAPStdize_noah_withAP.csv')
         
     diff = False
     if diff:
