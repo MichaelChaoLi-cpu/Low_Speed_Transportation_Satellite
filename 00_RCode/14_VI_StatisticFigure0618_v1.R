@@ -35,7 +35,7 @@ grob_add <- grobTree(textGrob("a",
                   args = list(mean = mean(dataset_used.Tokyo$lowSpeedDensity),
                               sd = sd(dataset_used.Tokyo$lowSpeedDensity)),
                   col = 'red', size = 2) +
-    xlab("Low-Speed Transportation Column") + 
+    xlab("Low-Speed Transportation") + 
     ylab("Density") +
     annotation_custom(grob) +
     annotation_custom(grob_add))
@@ -312,7 +312,7 @@ grob_add <- grobTree(textGrob("a",
                   args = list(mean = mean(dataset_used.Tokyo$lowSpeedDensity),
                               sd = sd(dataset_used.Tokyo$lowSpeedDensity)),
                   col = 'red', size = 2) +
-    xlab("Low-Speed Transportation Column") + 
+    xlab("Low-Speed Transportation") + 
     ylab("Density") +
     annotation_custom(grob) +
     annotation_custom(grob_add))
@@ -561,7 +561,7 @@ grob_add <- grobTree(textGrob("l",
     annotation_custom(grob_add))
 
 
-jpeg(file="11_Figure0618/descriptive_stat_transfomed.jpeg", width = 210, height = 297, units = "mm", quality = 300, res = 300)
+jpeg(file="11_Figure0618/descriptive_stat_transfom.jpeg", width = 210, height = 297, units = "mm", quality = 300, res = 300)
 grid.arrange(a, b, c,
              d, e, f,
              g, h, i,
@@ -569,4 +569,3 @@ grid.arrange(a, b, c,
              nrow = 4)
 dev.off()
 #-------------descriptive statistics--------------
-

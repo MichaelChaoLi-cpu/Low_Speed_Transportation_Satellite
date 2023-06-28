@@ -10,9 +10,26 @@ import os
 import pandas as pd
 import pyreadr
 from shap import TreeExplainer
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import xgboost as xgb
+
+def compareModel(X, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                        random_state=42)
+    xgb_regressor = xgb.XGBRegressor(tree_method='gpu_hist')
+    xgb_regressor.fit(X_train, y_train)
+    y_pred = xgb_regressor.predict(X_test)
+    accuracy = r2_score(y_test, y_pred)
+    print(f"XGBoost; Accuracy: {accuracy*100:.2f}%")
+    rfmodel = RandomForestRegressor(n_jobs=-1)
+    rfmodel.fit(X_train, y_train)
+    y_pred = rfmodel.predict(X_test)
+    rfaccuracy = r2_score(y_test, y_pred)
+    print(f"rf Accuracy: {rfaccuracy:.4f}")
+    return None
+    
 
 def makeFinalDataset():
     result = pyreadr.read_r(REPO_DATA_LOCATION + "99_dataset_to_python.rds")
@@ -44,6 +61,21 @@ def getXandStanYnoah():
 
     return df_output, X, y
 
+def getXandYnoahNormalize():
+    df = pd.read_csv(REPO_LOCATION + "98_DatasetWithNoah.csv")
+    df.set_index(['GridID', 'time'], inplace=True)
+    df.dropna(inplace=True)
+    df_output = df.copy()
+    aim_variable_list = ['lowSpeedDensity',  
+                         'tair', 'psurf', 'qair', 'wind', 'rainf',
+                         'NTL', 'NDVI', 'PBLH']
+    for variable_name in aim_variable_list:
+        df_output[variable_name] = df_output.groupby('GridID')[variable_name].transform(lambda x: (x - x.min()) / (x.max()- x.min()))
+    
+    X = df_output.iloc[:,1:df.shape[1]].copy()
+    y = df_output.iloc[:,0:1].copy()
+
+    return df_output, X, y
 
 def getXandYdiff():
     df = pd.read_csv(REPO_LOCATION + "98_DatasetWithNoah.csv", index_col=0)
@@ -347,6 +379,14 @@ REPO_RESULT_LOCATION = REPO_LOCATION + '03_Results/'
 REPO_DATA_LOCATION = REPO_LOCATION + '04_Data/'
 
 if __name__ == '__main__':
+    model_compare = False
+    if model_compare:
+        df, X, y = getXandStanYnoah()
+        
+        print(X.columns)
+        compareModel(X, y)
+    
+    
     run = False
     if run:
         df, X, y = getXandStanYnoah()
@@ -525,6 +565,10 @@ if __name__ == '__main__':
         dataset_to_analysis = makeDatasetWithShap(df, shap_value)
         dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + '05_mergedXSHAPStdize_firstdif_noah_withoutAP.csv')
         
+
+
+
+
 
 """
 print(best_n_estimators, best_lr, best_maxdepth, best_child, best_gamma, best_Subsample, best_colsample_bytree, best_reg_alpha, best_reg_lambda)

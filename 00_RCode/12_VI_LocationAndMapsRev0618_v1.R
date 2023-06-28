@@ -10,6 +10,7 @@ library(tmap)
 library(rgdal)
 library(ggplot2)
 library(sf)
+library(sp)
 library(ggspatial) # scale bars and north arrows
 library(ggmap)
 library(cowplot)
@@ -89,3 +90,58 @@ setwd("../../")
 jpeg(file="11_Figure0618/locationWithMulti.jpeg", width = 280, height = 210, units = "mm", quality = 300, res = 300)
 locationWithMulti
 dev.off()
+
+
+### plot mean value
+df.ori <- read.csv('04_Data/98_DatasetWithNoah.csv')
+df.ori <- df.ori %>% 
+  dplyr::select("GridID", "lowSpeedDensity", 'x', 'y')
+df.ori <- stats::aggregate(df.ori[,c("lowSpeedDensity", "x", "y")],
+                           by = list(df.ori$GridID), mean)
+df.ori <- df.ori %>% mutate(lowSpeedDensity = ifelse(lowSpeedDensity > 1000000, 1000000, lowSpeedDensity))
+
+proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+xy <- df.ori[,c(3,4)]
+points_mesh <- SpatialPointsDataFrame(coords = xy, data = df.ori,
+                                      proj4string = CRS(proj))
+points_mesh <- points_mesh %>% st_as_sf()
+
+pal <- colorRampPalette(c("blue","green","yellow","red"))
+pal(20)
+
+shape_Japan_city <- readOGR(dsn = "./04_Data/shp/", layer = "jpn_admbnda_adm2_2019")
+shape_Japan_city@data$tokyo <- 0
+shape_Japan_city@data <- shape_Japan_city@data %>%
+  mutate(tokyo = ifelse(ADM1_PCODE=="JP13", 1, 0))
+shape_Japan_city@data$tokyo <- shape_Japan_city@data$tokyo %>% as.factor()
+shape_Japan_city <- st_as_sf(shape_Japan_city)
+tokyo_boudary <- shape_Japan_pref %>% filter(ADM1_PCODE == "JP13")
+
+(plot.x.01 <- ggplot() +
+    geom_sf(data = points_mesh, aes(color = lowSpeedDensity), alpha = 0.8, size = 0.5) +
+    scale_color_gradientn("Mean", colors = pal(20),
+                          breaks = c(0, 250000, 500000, 750000, 1000000), 
+                          labels = c("0", "250k", "500k", "750k", "1000k+")) +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5) +
+    geom_sf(data = tokyo_boudary, color = "black", fill = NA, alpha = 0.8, size = 1, linetype = "dashed") +
+    xlim(138.8, 140) +
+    ylim(35.3, 36.1) + 
+    annotation_scale(location = "bl", width_hint = 0.4) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+                           pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                           style = north_arrow_fancy_orienteering) +
+    theme_bw() +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank()
+    ) +
+    scale_x_continuous(labels = function(x) paste0(x, "°"), limits = c(138.8, 140)) +
+    scale_y_continuous(labels = function(x) paste0(x, "°"), limits = c(35.3, 36.1))
+)
+
+jpeg(file="11_Figure0618/meanX.Coeff.jpeg", width = 297, height = 210, units = "mm", quality = 300, res = 300)
+plot.x.01
+dev.off()
+
+
+
+
