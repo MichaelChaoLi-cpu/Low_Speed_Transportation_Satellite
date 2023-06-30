@@ -8,6 +8,7 @@ Created on Mon Jun 19 15:00:09 2023
 
 from M11_AN_RunXgbAndShap_v1 import runLocallyOrRemotely
 
+from joblib import load
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -60,6 +61,30 @@ def getMeanGridY():
     df_raw = pd.read_csv(REPO_DATA_LOCATION + "98_DatasetWithNoah.csv")
     mean_y_df = df_raw.groupby('GridID')['lowSpeedDensity'].mean().reset_index()
     return mean_y_df
+
+def plotImportanct(Filename = '03_importance_noah_withoutAP.joblib'):
+    importance = load(REPO_RESULT_LOCATION + Filename)
+    # Convert your importance dictionary to lists for plotting
+    features = list(importance.keys())
+    features = features[-5:] + features[0:8]
+    importance_values = list(importance.values())
+    importance_values = importance_values[-5:] + importance_values[0:8]
+    features = ['Temperature', "Air Pressure", "Humidity",
+                'Wind Speed', 'Precipitation', 'NTL',
+                "NDVI", "PBLH", 'Prevalance', 'Mortality',
+                'Emergence', 'Longitude', 'Latitude'
+                ]
+    
+    # Create a new figure and plot the data
+    plt.figure(figsize=(10, 6))
+    plt.barh(features, importance_values, color='skyblue')
+    plt.xlabel('Importance')
+    plt.ylabel('Features')
+    plt.title('Feature Importance')
+    plt.gca().invert_yaxis()
+    plt.savefig(REPO_FIGURE_LOCATION + 'Importance.jpg', format='jpeg', dpi=300)
+    plt.show()
+    return None
 
     
 

@@ -477,6 +477,10 @@ if __name__ == '__main__':
         dataset_to_analysis = makeDatasetWithShap(df, shap_value)
         dataset_to_analysis.to_csv(REPO_RESULT_LOCATION + '03_mergedXSHAPStdize_noah_withoutAP.csv')
         
+        importance = model.get_booster().get_score(importance_type='weight')
+        print(importance)
+        dump(importance, REPO_RESULT_LOCATION + '03_importance_noah_withoutAP.joblib')
+        
         
     diff = False
     if diff:
@@ -572,14 +576,10 @@ if __name__ == '__main__':
 
 """
 print(best_n_estimators, best_lr, best_maxdepth, best_child, best_gamma, best_Subsample, best_colsample_bytree, best_reg_alpha, best_reg_lambda)
-3000, 0.4, 16, 1, 0, 1, 0.8, 0.6, 1
+3000, 0.3, 17, 2, 0, 1, 0.8, 0.2, 0.5
 87.95% 99.81%
 ### .csv
 
-including 'mg_m2_troposphere_no2', 'ozone',
-3000, 0.3, 16, 2, 0, 1, 0.8, 0.2, 1
-88.24%
-### 1.csv
 """
 
 

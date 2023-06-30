@@ -69,7 +69,7 @@ reg_psurf <- plm(formula, dataset_Xshap, index = c('GridID', 'time'), model = 'p
 summary(reg_psurf)
 
 (moran.i.psurf <- GWPR.moran.test(reg_psurf, points_mesh, 0.0075))
-saveRDS(moran.i.tair, '12_Results0618/03.moran.i.psurf.rds')
+saveRDS(moran.i.psurf, '12_Results0618/03.moran.i.psurf.rds')
 
 GWPR.result.psurf <- GWPR(formula = psurf_shap ~ psurf, data = dataset_Xshap, index = c("GridID", "time"),
                          SDF = points_mesh, bw = 0.0075, adaptive = F,
@@ -170,7 +170,7 @@ formula <- PBLH_shap ~ PBLH
 reg_PBLH <- plm(formula, dataset_Xshap, index = c('GridID', 'time'), model = 'pooling')
 summary(reg_PBLH)
 
-(moran.i.PBLH <- GWPR.moran.test(reg_NDVI, points_mesh, 0.0075))
+(moran.i.PBLH <- GWPR.moran.test(reg_PBLH, points_mesh, 0.0075))
 saveRDS(moran.i.PBLH, '12_Results0618/03.moran.i.PBLH.rds')
 
 GWPR.result.PBLH <- GWPR(formula = PBLH_shap ~ PBLH, data = dataset_Xshap, index = c("GridID", "time"),
@@ -182,9 +182,17 @@ tm_shape(GWPR.result.PBLH$SDF) +
           style = 'cont')
 saveRDS(GWPR.result.PBLH, '12_Results0618/02.GWPR.result.PBLH.rds')
 
+formula <- prevalance_shap ~ prevalance
+reg_prevalance <- plm(formula, dataset_Xshap, index = c('GridID', 'time'), model = 'pooling')
+summary(reg_prevalance)
 
+formula <- mortality_shap ~ mortality
+reg_mortality <- plm(formula, dataset_Xshap, index = c('GridID', 'time'), model = 'pooling')
+summary(reg_mortality)
 
-
+formula <- emergence_shap ~ emergence
+reg_emergence <- plm(formula, dataset_Xshap, index = c('GridID', 'time'), model = 'pooling')
+summary(reg_emergence)
 
 
 
