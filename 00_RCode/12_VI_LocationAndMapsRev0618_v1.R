@@ -19,8 +19,6 @@ library(cowplot)
 library(ggrepel)
 library(plotrix)
 
-
-
 key <- readLines("./privateKeyGoogle.txt")
 register_google(key = key)
 
@@ -211,7 +209,7 @@ SDF.coef <- SDF.coef %>%
     psurf = ifelse(psurf < 0.10, 0.10, psurf)
   )
 
-grob_add <- grobTree(textGrob("d",
+grob_add <- grobTree(textGrob("b",
                               x = 0.02,  y = 0.95, hjust = 0,
                               gp = gpar(col = "black", fontsize = 10)))
 pal <- colorRampPalette(c("white", "yellow","red"))
@@ -491,3 +489,146 @@ grid.arrange(plot.tair.01, plot.psurf.01,
              nrow = 4)
 dev.off()
 
+
+
+key <- readLines("./privateKeyGoogle.txt")
+register_google(key = key)
+
+tokyo_basemap <- get_map( c(left = 138.5, bottom = 35.3, right = 140.2, top = 36.1),
+                           maptype = 'satellite', source = 'google')
+ggmap(tokyo_basemap)
+
+# rainf
+GWPR.result.rainf <- readRDS('12_Results0618/02.GWPR.result.rainf.rds')
+SDF.coef <- GWPR.result.rainf$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(rainf = ifelse(abs(rainf_TVa) < 1.64, 0, rainf)
+  )
+SDF.coef$rainf %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    rainf = ifelse(rainf > 0.02, 0.02, rainf),
+    rainf = ifelse(rainf < -0.02, -0.02, rainf)
+  )
+
+grob_add <- grobTree(textGrob("a",
+                              x = 0.02,  y = 0.95, hjust = 0,
+                              gp = gpar(col = "white", fontsize = 14)))
+pal <- colorRampPalette(c("blue","green", "white", "yellow","red"))
+plot.pair.background <- ggmap(tokyo_basemap) +
+    geom_sf(data = SDF.coef, aes(color = rainf), alpha = 0.1, size = 0.5, inherit.aes = FALSE) +
+    scale_color_gradientn(colors = pal(21), limits = c(-0.02, 0.02), name = "Precipitation") +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5, inherit.aes = FALSE) +
+    geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed", inherit.aes = FALSE) +
+    xlim(138.8, 140) +
+    ylim(35.4, 36.0) + 
+    annotation_scale(location = "bl", width_hint = 0.4) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+                           pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                           style = north_arrow_fancy_orienteering) +
+    theme_bw() +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_text(size = 12),
+          axis.text.y = element_text(size = 12),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 10),
+          legend.key.size = unit(0.5, "cm")
+    ) +
+    scale_x_continuous(labels = function(x) paste0(x, "°"), limits = c(138.9, 140)) +
+    scale_y_continuous(labels = function(x) paste0(x, "°"), limits = c(35.4, 36.0)) +
+  annotation_custom(grob_add)
+
+# NDVI
+GWPR.result.NDVI <- readRDS('12_Results0618/02.GWPR.result.NDVI.rds')
+SDF.coef <- GWPR.result.NDVI$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(NDVI = ifelse(abs(NDVI_TVa) < 1.64, 0, NDVI)
+  )
+SDF.coef$NDVI %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    NDVI = ifelse(NDVI > 0.05, 0.05, NDVI),
+    NDVI = ifelse(NDVI < -0.05, -0.05, NDVI)
+  )
+
+grob_add <- grobTree(textGrob("b",
+                              x = 0.02,  y = 0.95, hjust = 0,
+                              gp = gpar(col = "white", fontsize = 14)))
+pal <- colorRampPalette(c("blue","green", "white", "yellow","red"))
+(plot.NDVI.background <- ggmap(tokyo_basemap) +
+    geom_sf(data = SDF.coef, aes(color = NDVI), alpha = 0.1, size = 0.5, inherit.aes = FALSE) +
+    scale_color_gradientn(colors = pal(21), limits = c(-0.05, 0.05), name = "NDVI") +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5, inherit.aes = FALSE) +
+    geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed", inherit.aes = FALSE) +
+    xlim(138.8, 140) +
+    ylim(35.4, 36.0) + 
+    annotation_scale(location = "bl", width_hint = 0.4) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+                           pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                           style = north_arrow_fancy_orienteering) +
+    theme_bw() +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_text(size = 12),
+          axis.text.y = element_text(size = 12),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 10),
+          legend.key.size = unit(0.5, "cm")
+    ) +
+    scale_x_continuous(labels = function(x) paste0(x, "°"), limits = c(138.9, 140)) +
+    scale_y_continuous(labels = function(x) paste0(x, "°"), limits = c(35.4, 36.0)) +
+    annotation_custom(grob_add)
+)
+
+# NTL
+GWPR.result.NTL <- readRDS('12_Results0618/02.GWPR.result.NTL.rds')
+SDF.coef <- GWPR.result.NTL$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(NTL = ifelse(abs(NTL_TVa) < 1.64, 0, NTL)
+  )
+SDF.coef$NTL %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    NTL = ifelse(NTL > 0.04, 0.04, NTL),
+    NTL = ifelse(NTL < -0.04, -0.04, NTL)
+  )
+grob_add <- grobTree(textGrob("c",
+                              x = 0.02,  y = 0.95, hjust = 0,
+                              gp = gpar(col = "white", fontsize = 14)))
+pal <- colorRampPalette(c("blue","green", "white", "yellow","red"))
+(plot.NTL.background <- ggmap(tokyo_basemap) +
+    geom_sf(data = SDF.coef, aes(color = NTL), alpha = 0.1, size = 0.5, inherit.aes = FALSE) +
+    scale_color_gradientn(colors = pal(21), limits = c(-0.04, 0.04), name = "NTL") +
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5, inherit.aes = FALSE) +
+    geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 1, linetype = "dashed", inherit.aes = FALSE) +
+    xlim(138.8, 140) +
+    ylim(35.4, 36.0) + 
+    annotation_scale(location = "bl", width_hint = 0.4) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+                           pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                           style = north_arrow_fancy_orienteering) +
+    theme_bw() +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_text(size = 12),
+          axis.text.y = element_text(size = 12),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 10),
+          legend.key.size = unit(0.5, "cm")
+    ) +
+    scale_x_continuous(labels = function(x) paste0(x, "°"), limits = c(138.9, 140)) +
+    scale_y_continuous(labels = function(x) paste0(x, "°"), limits = c(35.4, 36.0)) +
+    annotation_custom(grob_add)
+)
+
+
+jpeg(file="11_Figure0618/GWPR.coef.background.jpeg", width = 200, height = 300, units = "mm", quality = 300, res = 300)
+grid.arrange(plot.pair.background,
+             plot.NDVI.background,
+             plot.NTL.background,
+             nrow = 3)
+dev.off()
