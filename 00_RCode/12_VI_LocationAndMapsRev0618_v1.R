@@ -625,10 +625,36 @@ pal <- colorRampPalette(c("blue","green", "white", "yellow","red"))
     annotation_custom(grob_add)
 )
 
+grob_add <- grobTree(textGrob("d",
+                              x = 0.02,  y = 0.95, hjust = 0,
+                              gp = gpar(col = "white", fontsize = 14)))
+(plot.background <- ggmap(tokyo_basemap)+
+    geom_sf(data = shape_Japan_city, color = "grey10", fill = NA, alpha = 0.4, size = 0.5, inherit.aes = FALSE) +
+    geom_sf(data = tokyo_boudary, color = "red", fill = NA, alpha = 0.8, size = 2, linetype = "dashed", inherit.aes = FALSE) +
+    xlim(138.8, 140) +
+    ylim(35.4, 36.0) + 
+    annotation_scale(location = "bl", width_hint = 0.4) +
+    annotation_north_arrow(location = "bl", which_north = "true", 
+                           pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                           style = north_arrow_fancy_orienteering) +
+    theme_bw() +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x = element_text(size = 12),
+          axis.text.y = element_text(size = 12),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 10),
+          legend.key.size = unit(0.5, "cm")
+    ) +
+    scale_x_continuous(labels = function(x) paste0(x, "°"), limits = c(138.9, 140)) +
+    scale_y_continuous(labels = function(x) paste0(x, "°"), limits = c(35.4, 36.0)) +
+    annotation_custom(grob_add)
+)
 
-jpeg(file="11_Figure0618/GWPR.coef.background.jpeg", width = 200, height = 300, units = "mm", quality = 300, res = 300)
+jpeg(file="11_Figure0618/GWPR.coef.background.jpeg", width = 300, height = 240, units = "mm", quality = 300, res = 300)
 grid.arrange(plot.pair.background,
              plot.NDVI.background,
              plot.NTL.background,
-             nrow = 3)
+             plot.background,
+             nrow = 2)
 dev.off()
