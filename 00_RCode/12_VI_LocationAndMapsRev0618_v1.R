@@ -658,3 +658,125 @@ grid.arrange(plot.pair.background,
              plot.background,
              nrow = 2)
 dev.off()
+
+#---------------------------------------
+GWPR.result.tair <- readRDS('12_Results0618/02.GWPR.result.tair.rds')
+SDF.coef <- GWPR.result.tair$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(tair = ifelse(tair < -0.05, -0.05, tair),
+         tair = ifelse(tair > 0.05, 0.05, tair)
+  )
+SDF.coef <- SDF.coef %>% 
+  mutate(tair = ifelse(abs(tair_TVa) < 1.64, 0, tair)
+  )
+all_df <- SDF.coef %>% dplyr::select(tair)
+
+GWPR.result.psurf <- readRDS('12_Results0618/02.GWPR.result.psurf.rds')
+SDF.coef <- GWPR.result.psurf$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(psurf = ifelse(abs(psurf_TVa) < 1.64, 0, psurf)
+  )
+SDF.coef$psurf %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    psurf = ifelse(psurf > 0.15, 0.15, psurf),
+    psurf = ifelse(psurf < 0.10, 0.10, psurf)
+  )
+all_df$psurf <- SDF.coef$psurf
+
+GWPR.result.qair <- readRDS('12_Results0618/02.GWPR.result.qair.rds')
+SDF.coef <- GWPR.result.qair$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(qair = ifelse(abs(qair_TVa) < 1.64, 0, qair)
+  )
+SDF.coef$qair %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    qair = ifelse(qair > 0.15, 0.15, qair),
+    qair = ifelse(qair < 0.05, 0.05, qair)
+  )
+all_df$qair <- SDF.coef$qair
+
+GWPR.result.wind <- readRDS('12_Results0618/02.GWPR.result.wind.rds')
+SDF.coef <- GWPR.result.wind$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(wind = ifelse(abs(wind_TVa) < 1.64, 0, wind)
+  )
+SDF.coef$wind %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    wind = ifelse(wind > -0.02, 0.02, wind),
+    wind = ifelse(wind < -0.12, -0.12, wind)
+  )
+all_df$wind <- SDF.coef$wind
+
+GWPR.result.rainf <- readRDS('12_Results0618/02.GWPR.result.rainf.rds')
+SDF.coef <- GWPR.result.rainf$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(rainf = ifelse(abs(rainf_TVa) < 1.64, 0, rainf)
+  )
+SDF.coef$rainf %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    rainf = ifelse(rainf > 0.02, 0.02, rainf),
+    rainf = ifelse(rainf < -0.02, -0.02, rainf)
+  )
+all_df$rainf <- SDF.coef$rainf
+
+GWPR.result.NDVI <- readRDS('12_Results0618/02.GWPR.result.NDVI.rds')
+SDF.coef <- GWPR.result.NDVI$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(NDVI = ifelse(abs(NDVI_TVa) < 1.64, 0, NDVI)
+  )
+SDF.coef$NDVI %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    NDVI = ifelse(NDVI > 0.05, 0.05, NDVI),
+    NDVI = ifelse(NDVI < -0.05, -0.05, NDVI)
+  )
+all_df$NDVI <- SDF.coef$NDVI
+
+GWPR.result.NTL <- readRDS('12_Results0618/02.GWPR.result.NTL.rds')
+SDF.coef <- GWPR.result.NTL$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(NTL = ifelse(abs(NTL_TVa) < 1.64, 0, NTL)
+  )
+SDF.coef$NTL %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    NTL = ifelse(NTL > 0.04, 0.04, NTL),
+    NTL = ifelse(NTL < -0.04, -0.04, NTL)
+  )
+all_df$NTL <- SDF.coef$NTL
+
+GWPR.result.PBLH <- readRDS('12_Results0618/02.GWPR.result.PBLH.rds')
+SDF.coef <- GWPR.result.PBLH$SDF
+SDF.coef <- st_as_sf(SDF.coef)
+SDF.coef <- SDF.coef %>% 
+  mutate(PBLH = ifelse(abs(PBLH_TVa) < 1.64, 0, PBLH)
+  )
+SDF.coef$PBLH %>% summary()
+SDF.coef <- SDF.coef %>% 
+  mutate(
+    PBLH = ifelse(PBLH > 0.05, 0.05, PBLH),
+    PBLH = ifelse(PBLH < -0.05, -0.05, PBLH)
+  )
+all_df$PBLH <- SDF.coef$PBLH
+
+coords <- st_coordinates(all_df)
+all_df$X <- coords[, "X"]
+all_df$Y <- coords[, "Y"]
+
+all_df <- st_drop_geometry(all_df)
+
+
+colnames(all_df) <- c('Temperature', 'Air Presure', 'Humidity', 'Wind Speed',
+                      'Precipitation', 'NDVI', 'NTL', 'PBLH', 'Longitude', 'Latitude')
+all_df %>% write.csv("12_Results0618/GWPR_Coeff.csv", row.names = FALSE)
